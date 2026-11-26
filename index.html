@@ -16,9 +16,9 @@
     --ink:#161616;
     --ink-soft:#5A5A5A;
     --ink-faint:#8C8C8C;
-    --accent:#2E2E40;
-    --accent-dark:#1B1B28;
-    --accent-soft:#EEEEF3;
+    --accent:#0077A8;
+    --accent-dark:#00577A;
+    --accent-soft:#E8F6FC;
     --line:#E2E2E2;
     --line-strong:#161616;
     --sunken:#F6F6F6;
@@ -43,7 +43,7 @@
   /* ---------- header ---------- */
   .app-header{ border-bottom:1px solid var(--line-strong); padding-bottom:16px; margin-bottom:22px; }
   .clinic-logo{ display:block; height:40px; width:auto; max-width:100%; margin:0 0 14px; }
-  .clinic-logo-text{ display:block; height:40px; line-height:40px; font-size:20px; font-weight:900; color:var(--accent); letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0 0 14px; }
+  .clinic-brand{ display:flex; align-items:center; font-weight:900; color:var(--accent); }
   .app-title{ font-size:22px; font-weight:900; margin:0; letter-spacing:.01em; }
   .app-sub{ font-size:14px; color:var(--ink-soft); margin:6px 0 0; }
   .data-status{ font-size:11.5px; color:var(--ink-faint); margin:8px 0 0; }
@@ -164,30 +164,8 @@
   #qrBox canvas{ display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
   #qrBox img, #qrBox table{ display:block; }
   .qr-hint{ font-size:13px; color:var(--ink-soft); margin:0; max-width:34ch; }
-  .qr-dense{ font-size:13px; font-weight:700; color:var(--accent); border-left:3px solid var(--accent); padding:2px 0 2px 10px; margin:-6px 0 18px; }
   .action-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
   .print-msg{ font-size:13px; color:var(--accent); font-weight:700; margin:6px 0 16px; }
-  /* メッセージ(任意) */
-  .msg-field{ margin:0 0 20px; }
-  .msg-field textarea{
-    display:block; width:100%; min-height:96px; padding:10px 12px; border:1px solid var(--line-strong);
-    border-radius:var(--radius); font:inherit; font-size:16px; line-height:1.6; color:var(--ink); background:#fff; resize:vertical;
-  }
-  .msg-meta{ display:flex; justify-content:space-between; gap:12px; margin-top:6px; font-size:12px; color:var(--ink-soft); line-height:1.6; }
-  .msg-count{ font-family:var(--font-mono); white-space:nowrap; }
-  .msg-count.is-full{ color:var(--accent); font-weight:700; }
-  .msg-card{
-    border:1.5px solid var(--accent); border-radius:var(--radius); background:var(--accent-soft);
-    padding:16px 18px 18px; margin:0 0 18px;
-  }
-  .msg-head{ display:flex; align-items:center; gap:10px; margin:0 0 10px; }
-  .msg-icon{
-    width:34px; height:34px; border-radius:50%; background:var(--accent); flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .msg-icon svg{ width:18px; height:18px; fill:#fff; }
-  .msg-title{ font-size:13px; font-weight:700; color:var(--accent); letter-spacing:.04em; margin:0; }
-  .msg-text{ font-size:16.5px; font-weight:700; line-height:1.8; margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
   .preview-list{ list-style:none; margin:16px 0 0; padding:0; border-top:1px solid var(--line); }
   .preview-item{ display:flex; align-items:center; gap:12px; padding:10px 2px; border-bottom:1px solid var(--line); }
   .preview-item .ex-name{ flex:1; min-width:0; font-size:14.5px; }
@@ -201,20 +179,8 @@
   }
   .ex-card .ex-name{ font-size:16.5px; }
   .ex-card .qty-badge{ display:block; font-size:16px; margin-top:4px; }
-  .ex-card .btn{ grid-column:1 / -1; width:100%; min-height:48px; font-size:15.5px; }
+  .ex-card .btn{ grid-column:1 / -1; width:100%; }
   .ex-card .btn svg{ width:16px; height:16px; }
-  /* YouTubeのサムネイル(「動画を見る」の上) */
-  .ex-thumb{
-    grid-column:1 / -1; position:relative; display:block; aspect-ratio:16 / 9;
-    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--sunken);
-  }
-  .ex-thumb img{ display:block; width:100%; height:100%; object-fit:cover; }
-  .ex-thumb-play{
-    position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px;
-    border-radius:50%; background:rgba(22,22,22,.55); display:flex; align-items:center; justify-content:center;
-    pointer-events:none;
-  }
-  .ex-thumb-play svg{ width:20px; height:20px; margin-left:3px; fill:#fff; }
   .patient-note{
     margin-top:24px; padding-top:14px; border-top:1px solid var(--line);
     font-size:14px; line-height:1.7; color:var(--ink);
@@ -253,7 +219,6 @@
   @media (max-width:480px){
     .wrap{ padding:20px 14px 32px; }
     .clinic-logo{ height:34px; margin-bottom:12px; }
-    .clinic-logo-text{ height:34px; line-height:34px; font-size:17px; margin-bottom:12px; }
     .app-title{ font-size:19px; }
     .ex-row{ grid-template-columns:auto 1fr auto; column-gap:10px; }
     .ex-row .ex-no{ grid-column:2; grid-row:1; justify-self:start; }
@@ -293,8 +258,8 @@
 <!-- ============ スタッフ用画面 ============ -->
 <div class="wrap" id="staffView" hidden>
   <header class="app-header">
-    <img class="clinic-logo" alt="" data-logo>
-    <h1 class="app-title">セルフケアエクササイズ 処方作成</h1>
+    <div class="clinic-logo clinic-brand" data-logo></div>
+    <h1 class="app-title">セルフケアエクササイズ プラン作成</h1>
     <div class="data-status-row">
       <p class="data-status mono" id="dataStatus"></p>
       <button type="button" class="refresh-btn" id="refreshBtn">今すぐ更新</button>
@@ -309,14 +274,6 @@
 
   <section id="resultPanel" hidden aria-live="polite">
     <h2 id="resultTitle">処方リンクを作成しました</h2>
-    <div class="msg-field">
-      <label class="field-label" for="msgInput">メッセージ(任意)</label>
-      <textarea id="msgInput" maxlength="150" placeholder="例:毎日少しずつで大丈夫です。一緒に続けていきましょう!"></textarea>
-      <div class="msg-meta">
-        <span>入力すると、患者さんの画面と印刷用ページに表示されます。氏名など個人が特定できる内容は書かないでください。</span>
-        <span class="msg-count" id="msgCount">0/150</span>
-      </div>
-    </div>
     <div class="local-warn" id="localWarn" hidden role="alert">
       <b>このままではスマートフォンで開けるリンクを作れません。</b>
       パソコンに保存した index.html を直接開いているため、リンクがこのパソコンの中のファイルを指してしまいます。
@@ -335,7 +292,6 @@
       <div id="qrBox" aria-label="処方リンクのQRコード"></div>
       <p class="qr-hint">患者さんのスマートフォンのカメラでこのQRコードを読み取ると、処方内容が表示されます。</p>
     </div>
-    <p class="qr-dense" id="qrDense" hidden>QRコードが細かくなっています。読み取りにくいときは、メッセージを短くするか、種目を減らしてください。</p>
     </div>
 
     <div class="action-row">
@@ -358,7 +314,7 @@
 <!-- ============ 患者さん用画面 ============ -->
 <div class="wrap" id="patientView" hidden>
   <header class="app-header">
-    <img class="clinic-logo" alt="" data-logo>
+    <div class="clinic-logo clinic-brand" data-logo></div>
     <h1 class="app-title">セルフケアエクササイズ</h1>
     <p class="app-sub">あなたに処方されたエクササイズです。回数・セット数を守り、無理のない範囲で行ってください。</p>
   </header>
@@ -370,83 +326,186 @@
   "use strict";
 
   /* ===================== 設定 ===================== */
-  // 事業所名。ロゴ画像がないときは、ロゴの代わりにこの文字を表示します(ロゴ画像の説明文にも使います)
-  var CLINIC_NAME = "デモアプリ作成版";
-  // ロゴ画像(PNG)を Base64 にしたもの("data:image/png;base64,..." の形)。空なら事業所名を文字で表示します
-  var LOGO_DATA_URI = "";
-  // メインカラー(ボタン・強調の色)。例: "#2e2e40"
-  var MAIN_COLOR = "#2E2E40";
+  var APP_BRAND = "セルフエクササイズ";
+  var CLINIC_NAME = "CALORIE TRADE JAPAN";
 
-  var SHEET_ID = "1sFYccS_DqNLv2G1UatKgNshHSy5skIjjkqSWTcXZUxo";
-  var SHEET_NAME = "自宅エクササイズ動画リスト・カテゴリ別";
-  var SHEET_QUERY_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?sheet=" + encodeURIComponent(SHEET_NAME);
-  var SHEET_CSV_URL = SHEET_QUERY_URL + "&headers=1&tqx=out:csv";
-  var SHEET_URLS = [SHEET_CSV_URL];
-  var SHEET_JSONP_URL = SHEET_QUERY_URL + "&headers=1&tqx=out:json;responseHandler:";
+  // スプレッドシート「11.19_セルフケアエクササイズ動画リスト」
+  // 種目データのシート(「自宅エクササイズ動画リスト_カテゴリ別_V2」)の gid は 2146543614 です。
+  var SHEET_ID  = "1sFYccS_DqNLv2G1UatKgNshHSy5skIjjkqSWTcXZUxo";
+  var SHEET_GID = "2146543614";
+  var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&gid=" + SHEET_GID;
+  var SHEET_EXPORT_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=" + SHEET_GID;
+  var SHEET_URLS = [SHEET_CSV_URL, SHEET_EXPORT_URL];
+  // ローカルのファイルとして開いた場合(file://)はブラウザの制限で上の2つが使えないため、
+  // <script> で読み込む方式(JSONP)も同時に使う
+  var SHEET_JSONP_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?gid=" + SHEET_GID + "&headers=1&tqx=out:json;responseHandler:";
   var FETCH_TIMEOUT_MS = 6000;
   // GitHub Pages などで公開したこのアプリのURL(例: "https://xxxx.github.io/selfcare/")。
   // パソコンに保存した index.html を直接開いて使うときも、処方リンクとQRコードはこのURLで作られます。
   // 空のままなら、開いているページのURLを使います(パソコンのファイルを開いた場合はリンクを作れません)。
-  var PUBLIC_URL = "";
+  var PUBLIC_URL = "https://sobuemakoto1995-afk.github.io/calorietradejapan-selfcare-exercise/";
   // スタッフ用画面を開いたままでも、この間隔でシートを読み直す
   var AUTO_REFRESH_MS = 5 * 60 * 1000;
   // 画面に戻ってきたとき、前回の取得からこの時間以上たっていれば読み直す
   var REFRESH_ON_RETURN_MS = 60 * 1000;
 
-  // 組み込みデータ(スプレッドシートを取得できなかったときに使用)。2026/11/16 にシートから読み込んだ51件
+  // 組み込みデータ(スプレッドシートを取得できなかったときに使用)
   var BUILTIN_EXERCISES = [
-    {"no":1,"name":"後頭下筋群セルフマッサージ","cat":"首・肩甲骨","purpose":"緩める","url":"https://youtu.be/ow79jRbdkVY?si=HQSTiTr7_95h7RCX"},
-    {"no":2,"name":"後頭下筋群セルフマッサージ (ストレッチポール上)","cat":"首・肩甲骨","purpose":"緩める","url":"https://youtu.be/z5BmYxR9kiM?si=u6TYAXtMZG8qL_FA"},
-    {"no":3,"name":"肩甲骨・肩回しストレッチ (ストレッチポール上)","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/mLA3SdaALZ0?si=eqNXYpvwMglmlcmP"},
-    {"no":4,"name":"肩甲骨回しストレッチ (座位)","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/F8rw28rpTZI?si=WP4E3b-h6-ew-pwO"},
-    {"no":5,"name":"僧帽筋上部ストレッチ","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/1kKABG_wBKw?si=EsFElGluVZdA5Xi4"},
-    {"no":6,"name":"斜角筋/胸鎖乳突筋 ストレッチ","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/ZvPLQBuPifk?si=pCUeo7Ls12V-KIv8"},
-    {"no":7,"name":"頚部屈伸ex","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/Y2riw8EST0w?si=LTUUwQLVAYBdhlCR"},
-    {"no":8,"name":"chin-in ex","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/AuDBspynFsU?si=MKyaZsK7VY-gdLX_"},
-    {"no":9,"name":"Prone floor cobra","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/L2nibqVOgOQ?si=I_YfXe70NUptYJje"},
-    {"no":10,"name":"Scapular push up","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/gpTEyZVnmuw?si=UWe0mXvj-mmn1nEn"},
-    {"no":11,"name":"Door stretch (大胸筋ストレッチ)","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/Dto3GWOyePY?si=1pp9LaVH0iftQ5h0"},
-    {"no":12,"name":"1st肩外旋ex","cat":"肩関節","purpose":"整える","url":"https://youtu.be/F5EPruRWf0Y?si=NfocUwmfN_irQ6Yx"},
-    {"no":13,"name":"1st肩外旋ex(チューブ)","cat":"肩関節","purpose":"整える","url":"https://youtu.be/B3G94o0sWvE?si=OODe4cArA4TyV5N8"},
-    {"no":14,"name":"棘上筋ex (チューブ)","cat":"肩関節","purpose":"整える","url":"https://youtu.be/5gpuzcBlV3Q?si=BjOUkEWdxx5tRTEl"},
-    {"no":15,"name":"テーブルサンディング","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/lcO-zu1y7EU?si=3tmZ0eMigzez-Gps"},
-    {"no":16,"name":"ウォールサンディング","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/s71iDVRatzY?si=Q0v-ukYdF172J_o-"},
-    {"no":17,"name":"肩夜間ポジショニング","cat":"肩関節","purpose":"その他","url":"https://youtu.be/ZMrbB9kRQD0?si=62-dh-h8-ZstXNaN"},
-    {"no":18,"name":"羽ばたきエクササイズ","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/0AUJgBSmKHI?si=7VWZyBOP-tQfTQ_n"},
-    {"no":19,"name":"90-90 胸椎回旋ストレッチ","cat":"背中・腰","purpose":"伸ばす","url":"https://youtu.be/YAsjjG33nrc?si=-0F5wjVOhJLfKd0x"},
-    {"no":20,"name":"Rock Back Child Pose","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/LqRUg8vZ2uQ?si=XdxKECRz-owVgt29"},
-    {"no":21,"name":"腰椎・股関節屈曲ストレッチ","cat":"背中・腰","purpose":"伸ばす","url":"https://youtu.be/LASCvvHIxHk?si=eqgLOcFltXFD2_bz"},
-    {"no":22,"name":"Supine Hip Crossover Stretch","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/7l7yEVfYquE?si=EFd7KJAHsMTT1ML_"},
-    {"no":23,"name":"タオルプルダウン","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/Ye-eaCN12HQ?si=UYAMMtvjJYWVbQ-M"},
-    {"no":24,"name":"draw-in","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/UdV5EoAQ3LE?si=DjElMgkdUYOQMbZx"},
-    {"no":25,"name":"Cat & Cow","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/UAgP6cmxHjg?si=TIVxsiGbEtx5t6Vm"},
-    {"no":26,"name":"Bird Dog","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/BEIza1ZrleM?si=N3Fa4FIKrRj8dbC7"},
-    {"no":27,"name":"プランク","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/xp265PWiBVs?si=sgUqqbfrPFd355ss"},
-    {"no":28,"name":"Dead bug","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/bhzrFvNMMjI?si=gASb8ggm1y6UAoDc"},
-    {"no":29,"name":"前腕屈筋群ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/KFiOSnYn580?si=sW8zw6bvfDrQTJNs"},
-    {"no":30,"name":"前腕伸筋群ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/9EN_jqoaCV8?si=6eDk5tgbz9i1m4YL"},
-    {"no":31,"name":"手内在筋ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/pafuhvji0O0?si=3UxeULT8Y80_AUPj"},
-    {"no":32,"name":"腸腰筋ストレッチ","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/jFx97Qakq38?si=B1xpAg5tXOKh0YEZ"},
-    {"no":33,"name":"大腿直筋ストレッチ (腹臥位)","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/UlhsMKEhtBU?si=rSVIKpnLJknw8cpd"},
-    {"no":34,"name":"大殿筋ストレッチ(座位)","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/dZ9rFq_7iAc?si=bXT9KGIb2Ygeyp-0"},
-    {"no":35,"name":"クラムシェル","cat":"股関節","purpose":"整える","url":"https://youtu.be/X-n1U59dReE?si=GqResA0QqMO-XpkG"},
-    {"no":36,"name":"内転筋ボールex(座位)","cat":"股関節","purpose":"整える","url":"https://youtu.be/oGxDGpC1r0s?si=YVL2UaYZiSRPDnIy"},
-    {"no":37,"name":"Hip hinge (座位)","cat":"股関節","purpose":"整える","url":"https://youtu.be/hIQ9uz1kLuw?si=PHfMWxKubj9qqpFz"},
-    {"no":38,"name":"Single Leg Hip Lift","cat":"股関節","purpose":"整える","url":"https://youtu.be/Dhn1M9WFbKA?si=4UW3bG2OBuG-N-_w"},
-    {"no":39,"name":"大腿四頭筋遠位マッサージ","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/hYvgaE1m_to?si=NYxLJK777vkX8lb3"},
-    {"no":40,"name":"膝蓋下脂肪体マッサージ","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/_-20Ajo4PBk?si=kcyvjSlpy7bMX-CP"},
-    {"no":41,"name":"Patella mobilization","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/1Uf6i3nmuzk?si=iA7usjd4olIxQUSE"},
-    {"no":42,"name":"Patella setting","cat":"膝関節","purpose":"整える","url":"https://youtu.be/RKGL6k09Y6w?si=WgiGmuUrW6ZU1c9m"},
-    {"no":43,"name":"Leg extention (ボール潰し)","cat":"膝関節","purpose":"整える","url":"https://youtu.be/y5XRWzpBPHI?si=aYMkSCntGwfVSKJy"},
-    {"no":44,"name":"SLR ex","cat":"膝関節","purpose":"整える","url":"https://youtu.be/4pt0TtprUho?si=ppKeyOPHohqdnjHY"},
-    {"no":45,"name":"下腿内旋ex","cat":"膝関節","purpose":"整える","url":"https://youtu.be/-qoRuNMfYEg?si=NGy8SmRjdYq3Jqjh"},
-    {"no":46,"name":"スクワット","cat":"膝関節","purpose":"整える","url":"https://youtu.be/QEC0pjaIwLU?si=qoVFWKZ3x2v_R_Pl"},
-    {"no":47,"name":"足趾ストレッチ","cat":"足関節","purpose":"伸ばす","url":"https://youtu.be/JjGSvSJG-YU?si=FJrosfuRu_Vjk8mK"},
-    {"no":48,"name":"足底リリース(ボール)","cat":"足関節","purpose":"緩める","url":"https://youtu.be/uNubDHXOMDM?si=adGph9hX6plZ9O0M"},
-    {"no":49,"name":"腓腹筋ストレッチ(タオル)","cat":"足関節","purpose":"伸ばす","url":"https://youtu.be/-fQHuD79sJQ?si=qj3EyYhaKdacM5Of"},
-    {"no":50,"name":"タオルギャザー","cat":"足関節","purpose":"整える","url":"https://youtu.be/gql7H6pQsdg?si=xqTKuc8US8X3bxg7"},
-    {"no":51,"name":"Toe-tap ex","cat":"足関節","purpose":"整える","url":"https://youtu.be/yQI3m4yDjME?si=ZHOnrm7AYKZ2mZN7"}
-  ];
+  {
+    "no": 1,
+    "name": "チェストリフト",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/F5R_MtsqzJ8?si=cYiz0JnkYo58-RQT"
+  },
+  {
+    "no": 2,
+    "name": "キャットバック",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/o_mCPMNZnuQ?si=Ae_ZH-rEufogt7K4"
+  },
+  {
+    "no": 3,
+    "name": "シングルレッグストレッチ",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/5yATY9z8VNY?si=W2PNRjVTrDnoSB-5"
+  },
+  {
+    "no": 4,
+    "name": "ロールアップ",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/-S4gk0t97sQ?si=0vJLU7hDDIpgxcrd"
+  },
+  {
+    "no": 5,
+    "name": "ロールダウン",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/wPmqfjKc7sY?si=hBFzdAPGpINezf86"
+  },
+  {
+    "no": 6,
+    "name": "ローリング",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/vX1SbMNxUXI?si=gx109OAiMfEQ1CjG"
+  },
+  {
+    "no": 7,
+    "name": "スパインストレッチ",
+    "cat": "屈曲",
+    "purpose": "",
+    "url": "https://youtu.be/BPkLUenZKIo?si=xz6HaIt8u9n7L2oD"
+  },
+  {
+    "no": 8,
+    "name": "リブケージアームズ",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/wFuJ_bB82-I?si=BWbSo58xlo_vXMcE"
+  },
+  {
+    "no": 9,
+    "name": "スワン",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/2ZvoLLAS2M4?si=wcgKfk__0U8HnzRG"
+  },
+  {
+    "no": 10,
+    "name": "4スタンスストレッチ",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/c1tURw7MQ8U?si=zYJk0tOw_-RTwhTG"
+  },
+  {
+    "no": 11,
+    "name": "エルボースワン",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/FHy391y4v8A?si=xoVYlVT7sPPPPmX_"
+  },
+  {
+    "no": 12,
+    "name": "シングルレッグキックス",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/FFWglVQMwVw?si=SNXau6uZW5D8UCLX"
+  },
+  {
+    "no": 13,
+    "name": "ロングバックストレッチ",
+    "cat": "伸展",
+    "purpose": "",
+    "url": "https://youtu.be/61YHEa32fxY?si=4e7NPL_zG9E-1FxL"
+  },
+  {
+    "no": 14,
+    "name": "サイドベント",
+    "cat": "側屈",
+    "purpose": "",
+    "url": "https://youtu.be/OkhC6yWjGoo?si=E1HX4LCdXmfoXPYa"
+  },
+  {
+    "no": 15,
+    "name": "サイドプランク",
+    "cat": "側屈",
+    "purpose": "",
+    "url": "https://youtu.be/Guc8klBwK30?si=ojsbNXPazbziOV_n"
+  },
+  {
+    "no": 16,
+    "name": "ニーリングサイドベント",
+    "cat": "側屈",
+    "purpose": "",
+    "url": "https://youtu.be/NuNY_6emZ7A?si=-bEzOL3nrtoLvhUc"
+  },
+  {
+    "no": 17,
+    "name": "スター",
+    "cat": "側屈",
+    "purpose": "",
+    "url": "https://youtu.be/tEMrpAvRNB4?si=QUzFZ2Z0rsicDABr"
+  },
+  {
+    "no": 18,
+    "name": "マーメイド",
+    "cat": "側屈",
+    "purpose": "",
+    "url": "https://youtu.be/zg00YrMHyI8?si=mE-NgrmQzbVC5ebc"
+  },
+  {
+    "no": 19,
+    "name": "スパインツイスト",
+    "cat": "回旋",
+    "purpose": "",
+    "url": "https://youtu.be/BheE4FzOBLo?si=R1-U2lrmVquE480m"
+  },
+  {
+    "no": 20,
+    "name": "チェストオープン",
+    "cat": "回旋",
+    "purpose": "",
+    "url": "https://youtu.be/T1q8Bv2ae5s?si=jzBc3Cq5mOaHJyk4"
+  },
+  {
+    "no": 21,
+    "name": "チェーンソウ",
+    "cat": "回旋",
+    "purpose": "",
+    "url": "https://youtu.be/GDx5AV8AtO4?si=vRsuO7U7cDFn0AW5"
+  },
+  {
+    "no": 22,
+    "name": "姿勢改善と脊柱の柔軟性",
+    "cat": "座学",
+    "purpose": "",
+    "url": "https://youtu.be/oeflwujm4TI?si=1OpqFLMoYL6C_71g"
+  }
+];
 
   var CATEGORY_ORDER = ["頸・肩甲骨","肩関節","背中・腰","肘・手関節","股関節","膝関節","足関節"];
   // シート上の表記ゆれ(「首・肩甲骨」など)も同じ位置に並べる
@@ -455,8 +514,6 @@
   var UNIT_LABEL = { "r":"回", "s":"秒" };
   var DEFAULT_REPS = 10, DEFAULT_SETS = 2, MAX_VALUE = 999, MAX_RX_ITEMS = 100;
   var ERROR_TEXT = "処方内容を読み込めませんでした。お手数ですが、スタッフにリンクをもう一度発行してもらってください。";
-  var MAX_MESSAGE = 150;   // メッセージ(任意)の上限文字数
-  var MSG_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2l-1.4-1.3C5.4 15.2 2 12.1 2 8.4 2 5.3 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.3 22 8.4c0 3.7-3.4 6.8-8.6 11.5L12 21.2z"/></svg>';
   var PATIENT_NOTE = "実施中に痛みが強くなった場合は中止し、担当者にご相談ください。";
   var POPUP_BLOCKED_TEXT = "ポップアップがブロックされたため、印刷用ページを開けませんでした。ブラウザの設定でこのページのポップアップを許可してから、もう一度「印刷する(手渡し用)」を押してください。";
 
@@ -522,15 +579,14 @@
   // 1行目は見出し。必須項目の欠け・http以外のURLは除外。番号重複は先の1件。番号の昇順。
   function rowsToExercises(rows){
     var seen = {}, out = [];
-    var hasPurpose = (rows[0] || []).length >= 5;
     for (var i = 1; i < rows.length; i++){
       var r = rows[i] || [];
       var noStr   = String(r[0] == null ? "" : r[0]).trim();
       var name    = String(r[1] == null ? "" : r[1]).trim();
       var cat     = String(r[2] == null ? "" : r[2]).trim();
-      var purpose = hasPurpose ? String(r[3] == null ? "" : r[3]).trim() : "";
-      var urlCell = r[hasPurpose ? 4 : 3];
-      var url     = String(urlCell == null ? "" : urlCell).trim();
+      var fourth = String(r[3] == null ? "" : r[3]).trim();
+      var purpose = isHttpUrl(fourth) ? "" : fourth;
+      var url = isHttpUrl(fourth) ? fourth : String(r[4] == null ? "" : r[4]).trim();
       if (!noStr || !name || !cat || !url) continue;
       if (!/^https?:/i.test(url) || !isHttpUrl(url)) continue;
       if (!/^\d+(\.0+)?$/.test(noStr)) continue;
@@ -544,6 +600,8 @@
   }
 
   /* ===================== スプレッドシート取得 ===================== */
+  // 2つの公開URL(gviz と export)へ同時に問い合わせ、先に正しく読めた方を使う。
+  // どちらも失敗、または FETCH_TIMEOUT_MS を過ぎたら失敗扱い。
   function csvChannel(url){
     var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
     var opts = { cache:"no-store" };
@@ -589,7 +647,7 @@
     return { promise: promise, cancel: cleanup };
   }
 
-  // 2つの方法(gviz CSV / JSONP)を同時に試し、先に正しく読めたものを使う。
+  // 3つの方法(gviz CSV / export CSV / JSONP)を同時に試し、先に正しく読めたものを使う。
   // すべて失敗、または ms を過ぎたら失敗扱い。
   function fetchSheetList(ms){
     return new Promise(function(resolve, reject){
@@ -709,89 +767,18 @@
     if (/^https?:$/i.test(window.location.protocol)) return window.location.origin + window.location.pathname;
     return null;
   }
-  function buildRxLink(rx, message){
+  function buildRxLink(rx){
     var base = linkBase();
     if (!base) return null;
     // カンマはURLにそのまま使える文字なので %2C に変換しない(QRコードを小さく・読みやすくするため)
-    var m = encodeMessage(message);
-    return base + "?rx=" + encodeURIComponent(rx).replace(/%2C/gi, ",") + (m ? "&m=" + m : "");
+    return base + "?rx=" + encodeURIComponent(rx).replace(/%2C/gi, ",");
   }
 
-
-  /* ===================== メッセージ(任意) ===================== */
-  // 改行をそろえ、制御文字を除き、前後の空白を取り、上限文字数で切る
-  function cleanMessage(text){
-    var t = String(text == null ? "" : text).replace(/\r\n?/g, "\n")
-      .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202E\u2060-\u2064\uFEFF]/g, "")
-      .replace(/[ \t　]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-    var chars = Array.from(t);
-    if (chars.length > MAX_MESSAGE) t = chars.slice(0, MAX_MESSAGE).join("").trim();
-    return t;
-  }
-  // リンクに入れるため、文字(UTF-16)を URL で使える Base64(- と _)にする。
-  // 日本語は1文字が約2.7文字になり、UTF-8 より短く、QRコードが細かくなりにくい
-  function encodeMessage(text){
-    var t = cleanMessage(text);
-    if (!t) return "";
-    var bin = "";
-    for (var i = 0; i < t.length; i++){
-      var c = t.charCodeAt(i);
-      bin += String.fromCharCode(c >> 8, c & 255);
-    }
-    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-  // 読めないときは ""(メッセージなし)
-  function decodeMessage(str){
-    if (typeof str !== "string" || !str || str.length > 1200 || !/^[A-Za-z0-9_-]+$/.test(str)) return "";
-    try {
-      var b64 = str.replace(/-/g, "+").replace(/_/g, "/");
-      while (b64.length % 4) b64 += "=";
-      var bin = atob(b64), out = "";
-      if (bin.length % 2) return "";
-      for (var i = 0; i < bin.length; i += 2) out += String.fromCharCode((bin.charCodeAt(i) << 8) | bin.charCodeAt(i + 1));
-      // 対になっていないサロゲート(壊れた文字)があれば無効
-      if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(out)) return "";
-      return cleanMessage(out);
-    } catch(e){ return ""; }
-  }
 
   /* ===================== 共通 ===================== */
-  // メインカラーから、濃い色(押したとき)と薄い色(選択中の背景)を作る
-  function mixColor(hex, target, t){
-    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
-    if (!m) return null;
-    var n = parseInt(m[1], 16), out = "#";
-    [16, 8, 0].forEach(function(sh, k){
-      var v = (n >> sh) & 255;
-      v = Math.round(v + (target[k] - v) * t);
-      out += ("0" + v.toString(16)).slice(-2);
-    });
-    return out.toUpperCase();
-  }
-  function applyMainColor(){
-    var base = mixColor(MAIN_COLOR, [0,0,0], 0);
-    if (!base) return;
-    var root = document.documentElement.style;
-    root.setProperty("--accent", base);
-    root.setProperty("--accent-dark", mixColor(base, [0,0,0], 0.25));
-    root.setProperty("--accent-soft", mixColor(base, [255,255,255], 0.91));
-  }
-  function accentColor(){ return mixColor(MAIN_COLOR, [0,0,0], 0) || "#2E2E40"; }
-  function hasLogoImage(){ return /^data:image\//i.test(String(LOGO_DATA_URI || "")); }
   function setLogos(){
-    var imgs = document.querySelectorAll("img[data-logo]");
-    for (var i = imgs.length - 1; i >= 0; i--){
-      if (hasLogoImage()){
-        imgs[i].src = LOGO_DATA_URI;
-        imgs[i].alt = CLINIC_NAME;
-      } else {
-        // ロゴ画像がないときは事業所名を文字で表示
-        var span = document.createElement("span");
-        span.className = "clinic-logo-text";
-        span.textContent = CLINIC_NAME;
-        imgs[i].parentNode.replaceChild(span, imgs[i]);
-      }
-    }
+    var imgs = document.querySelectorAll("[data-logo]");
+    for (var i = 0; i < imgs.length; i++) imgs[i].textContent = APP_BRAND;
   }
   function hideLoading(){
     var el = document.getElementById("loadingScreen");
@@ -1011,21 +998,9 @@
       document.getElementById("previewList").innerHTML = "";
       document.getElementById("copyFeedback").textContent = "";
       document.getElementById("printMsg").hidden = true;
-      document.getElementById("msgInput").value = "";
-      updateMsgCount();
       updateCount();
       try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ try { window.scrollTo(0, 0); } catch(e2){} }
     });
-
-    // メッセージ:入力するとリンクとQRコードを作り直す
-    var msgInput = document.getElementById("msgInput");
-    var msgTimer = null;
-    msgInput.addEventListener("input", function(){
-      updateMsgCount();
-      clearTimeout(msgTimer);
-      msgTimer = setTimeout(function(){ if (currentResult) updateLink(); }, 350);
-    });
-    updateMsgCount();
 
     document.getElementById("localNote").hidden = !!linkBase();
     renderStatus();
@@ -1099,49 +1074,28 @@
     }
   }
 
-  function updateMsgCount(){
-    var el = document.getElementById("msgCount");
-    var n = Array.from(document.getElementById("msgInput").value).length;
-    el.textContent = Math.min(n, MAX_MESSAGE) + "/" + MAX_MESSAGE;
-    el.classList.toggle("is-full", n >= MAX_MESSAGE);
-  }
-  function currentMessage(){ return cleanMessage(document.getElementById("msgInput").value); }
-
-  var currentResult = null;   // { sel, link }
-  // リンクとQRコードを(メッセージを含めて)作る
-  function updateLink(){
-    var sel = currentResult.sel;
-    var link = buildRxLink(buildRxString(sel), currentMessage());
-    var linkOut = document.getElementById("linkOutput");
-    var qrBox = document.getElementById("qrBox");
-    currentResult.link = link;
-    document.getElementById("copyFeedback").textContent = "";
-    document.getElementById("localWarn").hidden = !!link;
-    document.getElementById("resultTitle").textContent = link ? "処方リンクを作成しました" : "処方内容(リンクは未作成)";
-    document.getElementById("linkArea").hidden = !link;
-    if (link){
-      linkOut.value = link;
-      renderQR(qrBox, link);
-      // 画面で1マス3pxを保てない(300pxに収まらない)ほど細かいとき
-      document.getElementById("qrDense").hidden = !(lastQR && lastQR.total * 3 > 300);
-    } else {
-      linkOut.value = "";
-      qrBox.innerHTML = "";
-      lastQR = null;
-      document.getElementById("qrDense").hidden = true;
-    }
-  }
-
   function renderResult(sel){
+    var rx = buildRxString(sel);
+    var link = buildRxLink(rx);
     var panel = document.getElementById("resultPanel");
     var linkOut = document.getElementById("linkOutput");
     var qrBox = document.getElementById("qrBox");
     var fb = document.getElementById("copyFeedback");
     var printMsg = document.getElementById("printMsg");
 
+    fb.textContent = "";
     printMsg.hidden = true;
-    currentResult = { sel: sel, link: null };
-    updateLink();
+    document.getElementById("localWarn").hidden = !!link;
+    document.getElementById("resultTitle").textContent = link ? "処方リンクを作成しました" : "処方内容(リンクは未作成)";
+    document.getElementById("linkArea").hidden = !link;
+    if (link){
+      linkOut.value = link;
+      renderQR(qrBox, link);
+    } else {
+      linkOut.value = "";
+      qrBox.innerHTML = "";
+      lastQR = null;
+    }
 
     document.getElementById("previewList").innerHTML = sel.map(function(s){
       return '<li class="preview-item"><span class="ex-no">' + noLabel(s.no) + '</span>' +
@@ -1153,7 +1107,6 @@
     try { panel.scrollIntoView({ behavior:"smooth", block:"start" }); } catch(e){}
 
     document.getElementById("copyBtn").onclick = function(){
-      var link = currentResult && currentResult.link;
       if (!link) return;
       copyText(link, linkOut).then(function(ok){
         fb.textContent = ok ? "コピーしました" : "コピーできませんでした。リンクを長押しして選択してください。";
@@ -1162,7 +1115,7 @@
       });
     };
     document.getElementById("printBtn").onclick = function(){
-      var ok = openPrintPage(sel, currentResult.link, qrBox, currentMessage());
+      var ok = openPrintPage(sel, link, qrBox);
       printMsg.textContent = POPUP_BLOCKED_TEXT;
       printMsg.hidden = ok;
     };
@@ -1203,11 +1156,8 @@
     return "";
   }
 
-  function buildPrintHtml(sel, link, qrMarkup, message){
-    message = cleanMessage(message);
-    var tight = sel.length > 20 && !!message;
+  function buildPrintHtml(sel, link, qrMarkup){
     var compact = sel.length > 12, dense = sel.length > 20;
-    var accent = accentColor();
     var rows = sel.map(function(s){
       return '<tr><td class="c-no">' + noLabel(s.no) + '</td><td>' + esc(s.name) + '</td>' +
         '<td class="c-num">' + s.reps + ' ' + s.unit + '</td><td class="c-num">' + s.sets + ' セット</td></tr>';
@@ -1224,16 +1174,15 @@
       'body{ font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif; color:#161616; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }' +
       '.sheet{ max-width:182mm; margin:0 auto; padding:20px 0; }' +
       '.logo{ height:34px; width:auto; display:block; margin:0 0 10px; }' +
-      '.logo-text{ display:block; font-size:18px; font-weight:900; line-height:34px; color:' + accent + '; letter-spacing:.04em; margin:0 0 10px; }' +
       'h1{ font-size:19px; font-weight:900; margin:0 0 12px; padding-bottom:8px; border-bottom:2px solid #161616; }' +
-      'h1 span{ color:' + accent + '; }' +
+      'h1 span{ color:#0077A8; }' +
       '.blanks{ display:flex; gap:28px; flex-wrap:wrap; font-size:14px; margin:12px 0 14px; }' +
       '.blank{ display:flex; align-items:flex-end; gap:6px; }' +
       '.blank i{ font-style:normal; display:inline-block; border-bottom:1px solid #161616; min-width:58mm; height:22px; }' +
       '.blank.date i{ min-width:44mm; }' +
       'table{ width:100%; border-collapse:collapse; font-size:' + (dense ? '10.5px' : compact ? '12px' : '13.5px') + '; }' +
       'th,td{ border:1px solid #161616; padding:' + (dense ? '1.5px 6px' : compact ? '4px 7px' : '7px 9px') + '; text-align:left; vertical-align:middle; line-height:1.4; }' +
-      (dense ? '.logo{ height:26px; margin-bottom:6px; } .logo-text{ font-size:15px; line-height:26px; margin-bottom:6px; } h1{ font-size:16px; margin-bottom:6px; } .blanks{ margin:6px 0 8px; } .qr-area{ margin-top:8px !important; padding:6px 10px !important; } .qr-table{ width:24mm !important; height:24mm !important; } .caution{ margin-top:8px !important; padding:6px 10px !important; font-size:10.5px !important; line-height:1.5 !important; }' : '') +
+      (dense ? '.logo{ height:26px; margin-bottom:6px; } h1{ font-size:16px; margin-bottom:6px; } .blanks{ margin:6px 0 8px; } .qr-area{ margin-top:8px !important; padding:6px 10px !important; } .qr-table{ width:24mm !important; height:24mm !important; } .caution{ margin-top:8px !important; padding:6px 10px !important; font-size:10.5px !important; line-height:1.5 !important; }' : '') +
       'th{ font-size:11.5px; font-weight:700; background:#F6F6F6; }' +
       '.c-no{ font-family:"JetBrains Mono",monospace; white-space:nowrap; width:16mm; }' +
       '.c-num{ font-family:"JetBrains Mono",monospace; text-align:center; white-space:nowrap; width:30mm; }' +
@@ -1243,28 +1192,18 @@
       '.qr-table{ flex-shrink:0; width:30mm; } .qr-table table{ width:30mm !important; height:30mm !important; border:0; } .qr-table td{ border:0 !important; padding:0 !important; }' +
       '.qr-text{ font-size:11.5px; line-height:1.6; margin:0; }' +
       '.qr-url{ display:block; font-family:"JetBrains Mono",monospace; font-size:10px; word-break:break-all; margin-top:4px; color:#161616; }' +
-      '.caution{ margin:14px 0 0; padding:10px 12px; border:1px solid ' + accent + '; font-size:11.5px; line-height:1.7; page-break-inside:avoid; break-inside:avoid; }' +
-      '.caution b{ color:' + accent + '; display:block; margin-bottom:2px; }' +
+      '.caution{ margin:14px 0 0; padding:10px 12px; border:1px solid #0077A8; font-size:11.5px; line-height:1.7; page-break-inside:avoid; break-inside:avoid; }' +
+      '.caution b{ color:#0077A8; display:block; margin-bottom:2px; }' +
       '.caution ol{ margin:0; padding-left:1.4em; }' +
-      '.msg{ margin:0 0 14px; padding:10px 14px; border:1.5px solid ' + accent + '; border-radius:6px; page-break-inside:avoid; break-inside:avoid; }' +
-      '.msg b{ display:block; font-size:11.5px; color:' + accent + '; letter-spacing:.04em; margin-bottom:3px; }' +
-      '.msg p{ margin:0; font-size:' + (dense ? '12px' : '13.5px') + '; font-weight:700; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }' +
-      (dense ? '.msg{ margin-bottom:8px; padding:6px 12px; }' : '') +
-      // 種目が多く、メッセージもあるときは、さらに詰めて1枚に収める
-      (tight ? '@page{ margin:9mm 12mm; } table{ font-size:10px; } th,td{ padding:1px 6px; line-height:1.25; } th{ font-size:10px; }' +
-        '.msg{ margin-bottom:6px; padding:4px 10px; } .msg b{ font-size:10px; margin-bottom:1px; } .msg p{ font-size:11px; line-height:1.5; }' +
-        '.logo-text{ font-size:14px; line-height:22px; margin-bottom:4px; } .logo{ height:22px; margin-bottom:4px; } h1{ font-size:15px; margin-bottom:4px; padding-bottom:5px; } .blanks{ margin:4px 0 6px; font-size:12.5px; }' +
-        '.qr-area{ margin-top:6px !important; padding:5px 10px !important; } .caution{ margin-top:6px !important; padding:5px 10px !important; font-size:10px !important; line-height:1.45 !important; }' : '') +
-      '.print-btn{ margin:18px 0 0; min-height:48px; padding:0 28px; font-size:15px; font-weight:700; font-family:inherit; color:#fff; background:' + accent + '; border:0; border-radius:8px; cursor:pointer; }' +
+      '.print-btn{ margin:18px 0 0; min-height:48px; padding:0 28px; font-size:15px; font-weight:700; font-family:inherit; color:#fff; background:#0077A8; border:0; border-radius:8px; cursor:pointer; }' +
       '@media print{ .print-btn{ display:none !important; } .sheet{ padding:0; } }' +
       '</style></head><body><div class="sheet">' +
-      (hasLogoImage() ? '<img class="logo" src="' + LOGO_DATA_URI + '" alt="' + esc(CLINIC_NAME) + '">' : '<span class="logo-text">' + esc(CLINIC_NAME) + '</span>') +
+      '<div class="logo" style="font-weight:900;color:#0077A8">' + esc(CLINIC_NAME) + '</div>' +
       '<h1>セルフケアエクササイズ <span>プログラム</span></h1>' +
       '<div class="blanks">' +
         '<div class="blank">お名前<i></i>様</div>' +
         '<div class="blank date">処方日<i></i></div>' +
       '</div>' +
-      (message ? '<div class="msg"><b>担当者からのメッセージ</b><p>' + esc(message) + '</p></div>' : '') +
       '<table><thead><tr><th>No.</th><th>種目名</th><th>回数または秒数</th><th>セット数</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       (!link ? '' : '<div class="qr-area">' + (qrMarkup || '') +
         '<p class="qr-text">スマートフォンのカメラでQRコードを読み取るか、下のURLを開くと、動画つきで内容を確認できます。' +
@@ -1278,13 +1217,13 @@
       '</div></body></html>';
   }
 
-  function openPrintPage(sel, link, qrBox, message){
+  function openPrintPage(sel, link, qrBox){
     var w = null;
     try { w = window.open("", "_blank"); } catch(e){ w = null; }
     if (!w || w.closed || typeof w.document === "undefined") return false;
     try {
       w.document.open();
-      w.document.write(buildPrintHtml(sel, link, qrMarkupFor(qrBox), message));
+      w.document.write(buildPrintHtml(sel, link, qrMarkupFor(qrBox)));
       w.document.close();
       if (w.focus) w.focus();
     } catch(e){ return false; }
@@ -1292,7 +1231,7 @@
   }
 
   /* ===================== 患者さん用画面 ===================== */
-  function initPatientView(rxValue, msgValue){
+  function initPatientView(rxValue){
     var view = document.getElementById("patientView");
     var body = document.getElementById("patientBody");
     var overlay = document.getElementById("consentOverlay");
@@ -1315,100 +1254,45 @@
       document.body.classList.remove("no-scroll");
       view.removeAttribute("inert");
       view.removeAttribute("aria-hidden");
-      renderPatientBody(body, sel, decodeMessage(msgValue));
+      renderPatientBody(body, sel);
     });
     try { chk.focus(); } catch(e){}
   }
 
-  function renderPatientBody(body, sel, message){
+  function renderPatientBody(body, sel){
     if (!sel.length){
       body.innerHTML = '<p class="error-note" role="alert">' + esc(ERROR_TEXT) + '</p>';
       return;
     }
     body.innerHTML =
-      (message ? '<section class="msg-card" aria-label="担当者からのメッセージ">' +
-        '<div class="msg-head"><span class="msg-icon">' + MSG_ICON + '</span><p class="msg-title">担当者からのメッセージ</p></div>' +
-        '<p class="msg-text">' + esc(message) + '</p></section>' : '') +
       '<ul class="ex-cards">' + sel.map(function(s){
         return '<li class="ex-card">' +
           '<span class="ex-no">' + noLabel(s.no) + '</span>' +
           '<div><span class="ex-name">' + esc(s.name) + '</span>' +
           '<span class="qty-badge">' + esc(qtyText(s)) + '</span></div>' +
-          thumbHtml(s) +
-          '<a class="btn btn-primary" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + PLAY_ICON + '動画を見る</a>' +
+          '<a class="btn" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + PLAY_ICON + '動画を見る</a>' +
         '</li>';
       }).join("") + '</ul>' +
       '<p class="patient-note">' + esc(PATIENT_NOTE) + '</p>';
-    // サムネイルは高画質のものから順に試す。動画によっては高画質版がないため、
-    // 読めない・120×90 の灰色の画像(見つからないときの画像)なら次の画質へ。どれもなければ枠ごと消す
-    var imgs = body.querySelectorAll(".ex-thumb img");
-    for (var i = 0; i < imgs.length; i++){
-      (function(img){
-        var step = 0;
-        function next(){
-          step++;
-          if (step < THUMB_QUALITIES.length){
-            img.src = "https://i.ytimg.com/vi/" + img.getAttribute("data-yt") + "/" + THUMB_QUALITIES[step] + ".jpg";
-          } else {
-            var a = img.closest(".ex-thumb"); if (a && a.parentNode) a.parentNode.removeChild(a);
-          }
-        }
-        img.addEventListener("error", next);
-        img.addEventListener("load", function(){ if (img.naturalWidth && img.naturalWidth <= 120) next(); });
-      })(imgs[i]);
-    }
-  }
-
-  // YouTubeのURLから動画IDを取り出す(youtu.be / watch?v= / shorts / embed / live)。取り出せなければ ""
-  function youtubeId(url){
-    var u;
-    try { u = new URL(String(url || "")); } catch(e){ return ""; }
-    var host = u.hostname.toLowerCase().replace(/^(www|m|music)\./, "");
-    var id = "";
-    if (host === "youtu.be"){
-      id = u.pathname.split("/")[1] || "";
-    } else if (host === "youtube.com" || host === "youtube-nocookie.com"){
-      var p = u.pathname.split("/");
-      if (p[1] === "watch") id = u.searchParams.get("v") || "";
-      else if (/^(shorts|embed|live|v)$/.test(p[1] || "")) id = p[2] || "";
-    }
-    return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
-  }
-  // サムネイルの画質(高い順)。maxres=1280×720 / sd=640×480 / hq=480×360 / mq=320×180
-  var THUMB_QUALITIES = ["maxresdefault", "sddefault", "hqdefault", "mqdefault"];
-  // サムネイル(押すと動画が開く)。YouTube以外のリンクのときは出さない
-  function thumbHtml(s){
-    var id = youtubeId(s.url);
-    if (!id) return "";
-    return '<a class="ex-thumb" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">' +
-      '<img src="https://i.ytimg.com/vi/' + id + '/' + THUMB_QUALITIES[0] + '.jpg" data-yt="' + id + '" alt="" width="1280" height="720" decoding="async" referrerpolicy="no-referrer">' +
-      '<span class="ex-thumb-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span>' +
-    '</a>';
   }
 
   /* ===================== 起動 ===================== */
   // テスト用に内部関数を公開(個人情報は扱いません)
   window.SelfCareRx = {
     parseCSV: parseCSV, rowsToExercises: rowsToExercises,
-    buildRxString: buildRxString, parseRxString: parseRxString, youtubeId: youtubeId,
-    encodeMessage: encodeMessage, decodeMessage: decodeMessage, cleanMessage: cleanMessage,
+    buildRxString: buildRxString, parseRxString: parseRxString,
     buildPrintHtml: buildPrintHtml, BUILTIN_EXERCISES: BUILTIN_EXERCISES,
     state: state, linkBase: linkBase, SHEET_CSV_URL: SHEET_CSV_URL, SHEET_URLS: SHEET_URLS
   };
 
-  applyMainColor();
   setLogos();
-  var rxParam = null, msgParam = null;
-  try {
-    var qs = new URLSearchParams(window.location.search);
-    rxParam = qs.get("rx");
-    msgParam = qs.get("m");
-  } catch(e){ rxParam = null; }
+  var rxParam = null;
+  try { rxParam = new URLSearchParams(window.location.search).get("rx"); } catch(e){ rxParam = null; }
   var isPatient = (rxParam !== null);
 
   window.SelfCareRx.ready = loadExercises().then(function(){
     hideLoading();
-    if (isPatient) initPatientView(rxParam, msgParam);
+    if (isPatient) initPatientView(rxParam);
     else initStaffView();
   });
 })();
