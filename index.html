@@ -377,16 +377,12 @@
   // メインカラー(ボタン・強調の色)。例: "#2e2e40"
   var MAIN_COLOR = "#2E2E40";
 
-  // スプレッドシート「11.19_セルフケアエクササイズ動画リスト」
-  // 種目データのシート(「自宅エクササイズ動画リスト_カテゴリ別_V2」)の gid は 232191300 です。
-  var SHEET_ID  = "1ngyKjeTiY9-fZdilN6Gg3PC5eL0enD6JVOX3zHrDI9Q";
-  var SHEET_GID = "232191300";
-  var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&gid=" + SHEET_GID;
-  var SHEET_EXPORT_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=" + SHEET_GID;
-  var SHEET_URLS = [SHEET_CSV_URL, SHEET_EXPORT_URL];
-  // ローカルのファイルとして開いた場合(file://)はブラウザの制限で上の2つが使えないため、
-  // <script> で読み込む方式(JSONP)も同時に使う
-  var SHEET_JSONP_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?gid=" + SHEET_GID + "&headers=1&tqx=out:json;responseHandler:";
+  var SHEET_ID = "1Wp4QTFbRhpQ3eeKhtngNMkaoAsjZN4Pl";
+  var SHEET_NAME = "自宅エクササイズ動画リスト・カテゴリ別";
+  var SHEET_QUERY_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?sheet=" + encodeURIComponent(SHEET_NAME);
+  var SHEET_CSV_URL = SHEET_QUERY_URL + "&tqx=out:csv";
+  var SHEET_URLS = [SHEET_CSV_URL];
+  var SHEET_JSONP_URL = SHEET_QUERY_URL + "&headers=1&tqx=out:json;responseHandler:";
   var FETCH_TIMEOUT_MS = 6000;
   // GitHub Pages などで公開したこのアプリのURL(例: "https://xxxx.github.io/selfcare/")。
   // パソコンに保存した index.html を直接開いて使うときも、処方リンクとQRコードはこのURLで作られます。
@@ -526,13 +522,15 @@
   // 1行目は見出し。必須項目の欠け・http以外のURLは除外。番号重複は先の1件。番号の昇順。
   function rowsToExercises(rows){
     var seen = {}, out = [];
+    var hasPurpose = (rows[0] || []).length >= 5;
     for (var i = 1; i < rows.length; i++){
       var r = rows[i] || [];
       var noStr   = String(r[0] == null ? "" : r[0]).trim();
       var name    = String(r[1] == null ? "" : r[1]).trim();
       var cat     = String(r[2] == null ? "" : r[2]).trim();
-      var purpose = String(r[3] == null ? "" : r[3]).trim();
-      var url     = String(r[4] == null ? "" : r[4]).trim();
+      var purpose = hasPurpose ? String(r[3] == null ? "" : r[3]).trim() : "";
+      var urlCell = r[hasPurpose ? 4 : 3];
+      var url     = String(urlCell == null ? "" : urlCell).trim();
       if (!noStr || !name || !cat || !url) continue;
       if (!/^https?:/i.test(url) || !isHttpUrl(url)) continue;
       if (!/^\d+(\.0+)?$/.test(noStr)) continue;
@@ -546,8 +544,6 @@
   }
 
   /* ===================== スプレッドシート取得 ===================== */
-  // 2つの公開URL(gviz と export)へ同時に問い合わせ、先に正しく読めた方を使う。
-  // どちらも失敗、または FETCH_TIMEOUT_MS を過ぎたら失敗扱い。
   function csvChannel(url){
     var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
     var opts = { cache:"no-store" };
@@ -593,7 +589,7 @@
     return { promise: promise, cancel: cleanup };
   }
 
-  // 3つの方法(gviz CSV / export CSV / JSONP)を同時に試し、先に正しく読めたものを使う。
+  // 2つの方法(gviz CSV / JSONP)を同時に試し、先に正しく読めたものを使う。
   // すべて失敗、または ms を過ぎたら失敗扱い。
   function fetchSheetList(ms){
     return new Promise(function(resolve, reject){
@@ -857,7 +853,7 @@
         '<span class="ex-no">' + noLabel(ex.no) + '</span>' +
         '<label class="ex-main" for="' + id + '">' +
           '<span class="ex-name">' + esc(ex.name) + '</span>' +
-          '<span class="ex-tag">' + esc(ex.cat) + ' / ' + esc(ex.purpose || "—") + '</span>' +
+          '<span class="ex-tag">' + esc(ex.cat) + (ex.purpose ? ' / ' + esc(ex.purpose) : "") + '</span>' +
         '</label>' +
         '<a class="ex-eye" href="' + esc(ex.url) + '" target="_blank" rel="noopener noreferrer" title="動画を確認する" aria-label="' + esc(ex.name) + 'の動画を確認する">' + EYE_ICON + '</a>' +
         '<div class="ex-qty">' +
