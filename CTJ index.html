@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>セルフケアエクササイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#161616;
+    --ink-soft:#5A5A5A;
+    --ink-faint:#8C8C8C;
+    --accent:#2E2E40;
+    --accent-dark:#1B1B28;
+    --accent-soft:#EEEEF3;
+    --line:#E2E2E2;
+    --line-strong:#161616;
+    --sunken:#F6F6F6;
+    --radius:8px;
+    --font-sans:'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    --font-mono:'JetBrains Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--font-sans);
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+  }
+  body.has-bar{ padding-bottom:120px; }
+  body.no-scroll{ overflow:hidden; }
+  .wrap{ max-width:780px; margin:0 auto; padding:28px 18px 40px; }
+  [hidden]{ display:none !important; }
+  button{ font-family:var(--font-sans); }
+  .mono{ font-family:var(--font-mono); }
+
+  /* ---------- header ---------- */
+  .app-header{ border-bottom:1px solid var(--line-strong); padding-bottom:16px; margin-bottom:22px; }
+  .clinic-logo{ display:block; height:40px; width:auto; max-width:100%; margin:0 0 14px; }
+  .clinic-logo-text{ display:block; height:40px; line-height:40px; font-size:20px; font-weight:900; color:var(--accent); letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0 0 14px; }
+  .app-title{ font-size:22px; font-weight:900; margin:0; letter-spacing:.01em; }
+  .app-sub{ font-size:14px; color:var(--ink-soft); margin:6px 0 0; }
+  .data-status{ font-size:11.5px; color:var(--ink-faint); margin:8px 0 0; }
+  .data-status.is-fallback{ color:var(--accent); font-weight:700; }
+  .data-status-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:8px 0 0; }
+  .data-status-row .data-status{ margin:0; }
+  .refresh-btn{
+    font-size:12px; font-weight:700; color:var(--ink); background:#fff; cursor:pointer;
+    border:1px solid var(--line); border-radius:999px; min-height:32px; padding:0 12px;
+  }
+  .refresh-btn:hover:not(:disabled){ border-color:var(--ink); }
+  .refresh-btn:disabled{ color:var(--ink-faint); cursor:default; }
+
+  /* ---------- loading ---------- */
+  #loadingScreen{
+    position:fixed; inset:0; z-index:2000; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; color:var(--ink-soft); letter-spacing:.08em;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:48px; padding:0 22px; border-radius:var(--radius);
+    font-size:15px; font-weight:700; cursor:pointer; text-decoration:none;
+    border:1.5px solid var(--ink); background:#fff; color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:hover{ background:var(--sunken); }
+  .btn:focus-visible, .search-input:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible{
+    outline:3px solid var(--accent); outline-offset:2px;
+  }
+  .btn-primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn-primary:hover:not(:disabled){ background:var(--accent-dark); border-color:var(--accent-dark); }
+  .btn-primary:disabled{ background:#D0D0D0; border-color:#D0D0D0; color:#fff; cursor:not-allowed; }
+
+  /* ---------- search ---------- */
+  .search-input{
+    width:100%; min-height:50px; padding:0 14px; font-size:16px; font-family:var(--font-sans);
+    border:1.5px solid var(--line); border-radius:var(--radius); color:var(--ink); background:#fff;
+    margin-bottom:20px; -webkit-appearance:none; appearance:none;
+  }
+  .search-input:focus{ border-color:var(--ink); }
+  .no-hit{ font-size:14px; color:var(--ink-soft); border:1px dashed var(--line); border-radius:var(--radius); padding:16px; text-align:center; }
+
+  /* ---------- category groups ---------- */
+  .cat-group{ margin-bottom:22px; }
+  .cat-title{
+    font-size:13px; font-weight:700; margin:0 0 8px; padding:0 0 6px;
+    border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:8px;
+  }
+  .cat-title .cat-count{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); font-weight:400; }
+
+  /* ---------- exercise row ---------- */
+  .ex-row{
+    display:grid; grid-template-columns:auto auto 1fr auto; align-items:center;
+    column-gap:12px; row-gap:10px;
+    border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px 12px; margin-bottom:8px; background:#fff;
+  }
+  .ex-row.is-checked{ border-color:var(--accent); background:var(--accent-soft); }
+  .ex-row input[type="checkbox"]{ width:22px; height:22px; margin:0; accent-color:var(--accent); cursor:pointer; }
+  .ex-no{
+    font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:4px; padding:2px 6px; background:#fff; white-space:nowrap;
+  }
+  .ex-main{ min-width:0; cursor:pointer; display:block; padding:2px 0; }
+  .ex-name{ display:block; font-weight:700; font-size:15px; line-height:1.45; word-break:break-word; }
+  .ex-tag{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .ex-eye{
+    width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--ink); background:#fff;
+  }
+  .ex-eye:hover{ border-color:var(--ink); }
+  .ex-eye svg{ width:18px; height:18px; }
+  .ex-qty{ display:none; grid-column:3 / -1; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .ex-row.is-checked .ex-qty{ display:flex; }
+  .qty-field{ display:flex; flex-direction:column; gap:3px; }
+  .qty-field > span{ font-size:11.5px; color:var(--ink-soft); }
+  .qty-field .qty-line{ display:flex; gap:6px; align-items:center; }
+  .qty-input{
+    width:72px; height:44px; padding:0 6px; border:1px solid var(--ink); border-radius:6px; background:#fff;
+    font-family:var(--font-mono); font-size:16px; text-align:center; color:var(--ink);
+  }
+  .qty-unit{
+    height:44px; padding:0 8px; border:1px solid var(--ink); border-radius:6px; background:#fff;
+    font-family:var(--font-sans); font-size:16px; color:var(--ink);
+  }
+  .qty-suffix{ font-size:14px; }
+
+  /* ---------- sticky bar ---------- */
+  .selection-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:60; background:#fff;
+    border-top:1px solid var(--line-strong);
+    padding:10px 18px calc(10px + env(safe-area-inset-bottom));
+  }
+  .selection-bar-inner{ max-width:780px; margin:0 auto; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .selection-count{ font-size:14px; margin-right:auto; white-space:nowrap; }
+  .selection-count b{ font-family:var(--font-mono); font-size:18px; color:var(--accent); margin:0 2px; }
+  .reset-btn small{ font-weight:400; font-size:11px; color:var(--ink-soft); }
+
+  /* ---------- result panel ---------- */
+  #resultPanel{ margin-top:30px; border-top:2px solid var(--ink); padding-top:20px; }
+  #resultPanel h2{ font-size:18px; font-weight:900; margin:0 0 14px; }
+  .field-label{ font-size:12px; color:var(--ink-soft); margin:0 0 6px; }
+  .link-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:6px; }
+  .link-row input{
+    flex:1 1 260px; min-width:0; min-height:48px; padding:0 12px; border:1px solid var(--line);
+    border-radius:var(--radius); background:var(--sunken); font-family:var(--font-mono); font-size:13px; color:var(--ink);
+  }
+  .local-warn{ border:1.5px solid var(--accent); border-radius:var(--radius); padding:14px 16px; font-size:14px; line-height:1.7; margin:0 0 18px; }
+  .local-warn b{ display:block; margin-bottom:4px; }
+  .local-warn code{ font-family:var(--font-mono); background:var(--sunken); padding:0 4px; border-radius:4px; }
+  .local-note{ font-size:12.5px; font-weight:700; color:var(--accent); border-left:3px solid var(--accent); padding:2px 0 2px 10px; margin:10px 0 0; }
+  .copy-feedback{ font-size:13px; font-weight:700; color:var(--accent); min-height:20px; margin:0 0 16px; }
+  .qr-row{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-bottom:18px; }
+  #qrBox{ width:150px; height:150px; flex-shrink:0; background:#fff; padding:0; }
+  #qrBox canvas{ display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+  #qrBox img, #qrBox table{ display:block; }
+  .qr-hint{ font-size:13px; color:var(--ink-soft); margin:0; max-width:34ch; }
+  .qr-dense{ font-size:13px; font-weight:700; color:var(--accent); border-left:3px solid var(--accent); padding:2px 0 2px 10px; margin:-6px 0 18px; }
+  .action-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .print-msg{ font-size:13px; color:var(--accent); font-weight:700; margin:6px 0 16px; }
+  /* メッセージ(任意) */
+  .msg-field{ margin:0 0 20px; }
+  .msg-field textarea{
+    display:block; width:100%; min-height:96px; padding:10px 12px; border:1px solid var(--line-strong);
+    border-radius:var(--radius); font:inherit; font-size:16px; line-height:1.6; color:var(--ink); background:#fff; resize:vertical;
+  }
+  .msg-meta{ display:flex; justify-content:space-between; gap:12px; margin-top:6px; font-size:12px; color:var(--ink-soft); line-height:1.6; }
+  .msg-count{ font-family:var(--font-mono); white-space:nowrap; }
+  .msg-count.is-full{ color:var(--accent); font-weight:700; }
+  .msg-card{
+    border:1.5px solid var(--accent); border-radius:var(--radius); background:var(--accent-soft);
+    padding:16px 18px 18px; margin:0 0 18px;
+  }
+  .msg-head{ display:flex; align-items:center; gap:10px; margin:0 0 10px; }
+  .msg-icon{
+    width:34px; height:34px; border-radius:50%; background:var(--accent); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .msg-icon svg{ width:18px; height:18px; fill:#fff; }
+  .msg-title{ font-size:13px; font-weight:700; color:var(--accent); letter-spacing:.04em; margin:0; }
+  .msg-text{ font-size:16.5px; font-weight:700; line-height:1.8; margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .preview-list{ list-style:none; margin:16px 0 0; padding:0; border-top:1px solid var(--line); }
+  .preview-item{ display:flex; align-items:center; gap:12px; padding:10px 2px; border-bottom:1px solid var(--line); }
+  .preview-item .ex-name{ flex:1; min-width:0; font-size:14.5px; }
+  .qty-badge{ font-family:var(--font-mono); font-weight:700; font-size:13.5px; color:var(--accent); white-space:nowrap; }
+
+  /* ---------- patient view ---------- */
+  .ex-cards{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .ex-card{
+    border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;
+    display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:12px; align-items:start;
+  }
+  .ex-card .ex-name{ font-size:16.5px; }
+  .ex-card .qty-badge{ display:block; font-size:16px; margin-top:4px; }
+  .ex-card .btn{ grid-column:1 / -1; width:100%; min-height:48px; font-size:15.5px; }
+  .ex-card .btn svg{ width:16px; height:16px; }
+  /* YouTubeのサムネイル(「動画を見る」の上) */
+  .ex-thumb{
+    grid-column:1 / -1; position:relative; display:block; aspect-ratio:16 / 9;
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--sunken);
+  }
+  .ex-thumb img{ display:block; width:100%; height:100%; object-fit:cover; }
+  .ex-thumb-play{
+    position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px;
+    border-radius:50%; background:rgba(22,22,22,.55); display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .ex-thumb-play svg{ width:20px; height:20px; margin-left:3px; fill:#fff; }
+  .patient-note{
+    margin-top:24px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:14px; line-height:1.7; color:var(--ink);
+  }
+  .patient-note::before{ content:""; display:inline-block; width:8px; height:8px; background:var(--accent); margin-right:8px; vertical-align:middle; }
+  .error-note{
+    border:1.5px solid var(--accent); border-radius:var(--radius); padding:16px 18px; font-size:15px; line-height:1.7;
+  }
+
+  /* ---------- consent ---------- */
+  .consent-overlay{
+    position:fixed; inset:0; z-index:1000; background:rgba(22,22,22,.55);
+    display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  .consent-card{
+    background:#fff; width:100%; max-width:480px; max-height:90vh; overflow-y:auto;
+    border:1px solid var(--ink); border-top:4px solid var(--accent); border-radius:var(--radius);
+    padding:24px 22px 22px;
+  }
+  .consent-card h2{ font-size:18px; font-weight:900; margin:0 0 14px; }
+  .consent-list{ margin:0 0 18px; padding:0; list-style:none; counter-reset:c; }
+  .consent-list li{
+    counter-increment:c; position:relative; padding:10px 0 10px 34px; border-bottom:1px solid var(--line);
+    font-size:15px; line-height:1.7;
+  }
+  .consent-list li::before{
+    content:counter(c); position:absolute; left:0; top:12px; width:22px; height:22px; border:1px solid var(--accent);
+    color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .consent-check{ display:flex; gap:10px; align-items:center; font-size:15px; font-weight:700; margin:0 0 16px; cursor:pointer; min-height:44px; }
+  .consent-check input{ width:22px; height:22px; margin:0; accent-color:var(--accent); flex-shrink:0; }
+  #consentAgreeBtn{ width:100%; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:480px){
+    .wrap{ padding:20px 14px 32px; }
+    .clinic-logo{ height:34px; margin-bottom:12px; }
+    .clinic-logo-text{ height:34px; line-height:34px; font-size:17px; margin-bottom:12px; }
+    .app-title{ font-size:19px; }
+    .ex-row{ grid-template-columns:auto 1fr auto; column-gap:10px; }
+    .ex-row .ex-no{ grid-column:2; grid-row:1; justify-self:start; }
+    .ex-row .ex-main{ grid-column:1 / 3; grid-row:2; padding-left:32px; }
+    .ex-row input[type="checkbox"]{ grid-column:1; grid-row:1; }
+    .ex-row .ex-eye{ grid-column:3; grid-row:1 / 3; }
+    .ex-qty{ grid-column:1 / -1; padding-left:32px; }
+    .selection-count{ width:100%; margin-right:0; }
+    .selection-bar .btn{ flex:1 1 0; padding:0 10px; font-size:14px; }
+    .reset-btn small{ display:none; }
+    body.has-bar{ padding-bottom:150px; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ scroll-behavior:auto !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen" role="status" aria-live="polite">読み込み中…</div>
+
+<!-- ============ 同意ダイアログ(患者さん用) ============ -->
+<div class="consent-overlay" id="consentOverlay" role="dialog" aria-modal="true" aria-labelledby="consentTitle" hidden>
+  <div class="consent-card">
+    <h2 id="consentTitle">ご利用前にご確認ください</h2>
+    <ol class="consent-list">
+      <li>痛みが強いときは、エクササイズを行わないでください。</li>
+      <li>実施中に痛み・しびれなどの症状の変化があった場合は、すぐにエクササイズを中止してください。</li>
+      <li>症状が続く場合は自己判断で再開せず、医師にご相談いただくか、次回の診察・リハビリ時に担当者へお伝えください。</li>
+    </ol>
+    <label class="consent-check">
+      <input type="checkbox" id="consentCheckbox">
+      <span>上記の内容を理解しました</span>
+    </label>
+    <button type="button" class="btn btn-primary" id="consentAgreeBtn" disabled>同意して進む</button>
+  </div>
+</div>
+
+<!-- ============ スタッフ用画面 ============ -->
+<div class="wrap" id="staffView" hidden>
+  <header class="app-header">
+    <img class="clinic-logo" alt="" data-logo>
+    <h1 class="app-title">セルフケアエクササイズ 処方作成</h1>
+    <div class="data-status-row">
+      <p class="data-status mono" id="dataStatus"></p>
+      <button type="button" class="refresh-btn" id="refreshBtn">今すぐ更新</button>
+    </div>
+    <p class="local-note" id="localNote" hidden>パソコンのファイルを直接開いています。処方リンクとQRコードを作るには、公開URLから開くか、index.html の PUBLIC_URL を設定してください。</p>
+    <p class="app-sub">種目を選び、回数(秒数)とセット数を入力して「処方リンクを作成する」を押してください。</p>
+  </header>
+
+  <input type="search" class="search-input" id="searchBox" placeholder="種目名で検索(例:ストレッチ、Patella)" aria-label="種目名で検索" autocomplete="off">
+  <div id="checklist"></div>
+  <p class="no-hit" id="noHit" hidden>該当する種目がありません</p>
+
+  <section id="resultPanel" hidden aria-live="polite">
+    <h2 id="resultTitle">処方リンクを作成しました</h2>
+    <div class="msg-field">
+      <label class="field-label" for="msgInput">メッセージ(任意)</label>
+      <textarea id="msgInput" maxlength="150" placeholder="例:毎日少しずつで大丈夫です。一緒に続けていきましょう!"></textarea>
+      <div class="msg-meta">
+        <span>入力すると、患者さんの画面と印刷用ページに表示されます。氏名など個人が特定できる内容は書かないでください。</span>
+        <span class="msg-count" id="msgCount">0/150</span>
+      </div>
+    </div>
+    <div class="local-warn" id="localWarn" hidden role="alert">
+      <b>このままではスマートフォンで開けるリンクを作れません。</b>
+      パソコンに保存した index.html を直接開いているため、リンクがこのパソコンの中のファイルを指してしまいます。
+      GitHub Pages で公開したURLからアプリを開くか、index.html の <code>PUBLIC_URL</code> に公開URLを設定してください。
+      下の一覧と印刷(QRコードなし)は使えます。
+    </div>
+    <div id="linkArea">
+    <p class="field-label">処方リンク</p>
+    <div class="link-row">
+      <input type="text" id="linkOutput" readonly aria-label="処方リンク">
+      <button type="button" class="btn" id="copyBtn">リンクをコピー</button>
+    </div>
+    <p class="copy-feedback" id="copyFeedback" aria-live="polite"></p>
+
+    <div class="qr-row">
+      <div id="qrBox" aria-label="処方リンクのQRコード"></div>
+      <p class="qr-hint">患者さんのスマートフォンのカメラでこのQRコードを読み取ると、処方内容が表示されます。</p>
+    </div>
+    <p class="qr-dense" id="qrDense" hidden>QRコードが細かくなっています。読み取りにくいときは、メッセージを短くするか、種目を減らしてください。</p>
+    </div>
+
+    <div class="action-row">
+      <button type="button" class="btn btn-primary" id="printBtn">印刷する(手渡し用)</button>
+    </div>
+    <p class="print-msg" id="printMsg" hidden></p>
+
+    <ul class="preview-list" id="previewList"></ul>
+  </section>
+</div>
+
+<div class="selection-bar" id="selectionBar" hidden>
+  <div class="selection-bar-inner">
+    <span class="selection-count">選択中: <b id="selCount">0</b>件</span>
+    <button type="button" class="btn reset-btn" id="resetBtn" title="選択・入力・検索をすべて初期化します">新しく作成する<small>(選択・入力・検索をすべて初期化)</small></button>
+    <button type="button" class="btn btn-primary" id="generateBtn" disabled>処方リンクを作成する</button>
+  </div>
+</div>
+
+<!-- ============ 患者さん用画面 ============ -->
+<div class="wrap" id="patientView" hidden>
+  <header class="app-header">
+    <img class="clinic-logo" alt="" data-logo>
+    <h1 class="app-title">セルフケアエクササイズ</h1>
+    <p class="app-sub">あなたに処方されたエクササイズです。回数・セット数を守り、無理のない範囲で行ってください。</p>
+  </header>
+  <div id="patientBody"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== 設定 ===================== */
+  // 事業所名。ロゴ画像がないときは、ロゴの代わりにこの文字を表示します(ロゴ画像の説明文にも使います)
+  var CLINIC_NAME = "デモアプリ作成版";
+  // ロゴ画像(PNG)を Base64 にしたもの("data:image/png;base64,..." の形)。空なら事業所名を文字で表示します
+  var LOGO_DATA_URI = "";
+  // メインカラー(ボタン・強調の色)。例: "#2e2e40"
+  var MAIN_COLOR = "#2E2E40";
+
+  var SHEET_ID = "1Wp4QTFbRhpQ3eeKhtngNMkaoAsjZN4Pl";
+  var SHEET_NAME = "自宅エクササイズ動画リスト・カテゴリ別";
+  var SHEET_QUERY_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?sheet=" + encodeURIComponent(SHEET_NAME);
+  var SHEET_CSV_URL = SHEET_QUERY_URL + "&tqx=out:csv";
+  var SHEET_URLS = [SHEET_CSV_URL];
+  var SHEET_JSONP_URL = SHEET_QUERY_URL + "&headers=1&tqx=out:json;responseHandler:";
+  var FETCH_TIMEOUT_MS = 6000;
+  // GitHub Pages などで公開したこのアプリのURL(例: "https://xxxx.github.io/selfcare/")。
+  // パソコンに保存した index.html を直接開いて使うときも、処方リンクとQRコードはこのURLで作られます。
+  // 空のままなら、開いているページのURLを使います(パソコンのファイルを開いた場合はリンクを作れません)。
+  var PUBLIC_URL = "";
+  // スタッフ用画面を開いたままでも、この間隔でシートを読み直す
+  var AUTO_REFRESH_MS = 5 * 60 * 1000;
+  // 画面に戻ってきたとき、前回の取得からこの時間以上たっていれば読み直す
+  var REFRESH_ON_RETURN_MS = 60 * 1000;
+
+  // 組み込みデータ(スプレッドシートを取得できなかったときに使用)。2026/11/16 にシートから読み込んだ51件
+  var BUILTIN_EXERCISES = [
+    {"no":1,"name":"後頭下筋群セルフマッサージ","cat":"首・肩甲骨","purpose":"緩める","url":"https://youtu.be/ow79jRbdkVY?si=HQSTiTr7_95h7RCX"},
+    {"no":2,"name":"後頭下筋群セルフマッサージ (ストレッチポール上)","cat":"首・肩甲骨","purpose":"緩める","url":"https://youtu.be/z5BmYxR9kiM?si=u6TYAXtMZG8qL_FA"},
+    {"no":3,"name":"肩甲骨・肩回しストレッチ (ストレッチポール上)","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/mLA3SdaALZ0?si=eqNXYpvwMglmlcmP"},
+    {"no":4,"name":"肩甲骨回しストレッチ (座位)","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/F8rw28rpTZI?si=WP4E3b-h6-ew-pwO"},
+    {"no":5,"name":"僧帽筋上部ストレッチ","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/1kKABG_wBKw?si=EsFElGluVZdA5Xi4"},
+    {"no":6,"name":"斜角筋/胸鎖乳突筋 ストレッチ","cat":"首・肩甲骨","purpose":"伸ばす","url":"https://youtu.be/ZvPLQBuPifk?si=pCUeo7Ls12V-KIv8"},
+    {"no":7,"name":"頚部屈伸ex","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/Y2riw8EST0w?si=LTUUwQLVAYBdhlCR"},
+    {"no":8,"name":"chin-in ex","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/AuDBspynFsU?si=MKyaZsK7VY-gdLX_"},
+    {"no":9,"name":"Prone floor cobra","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/L2nibqVOgOQ?si=I_YfXe70NUptYJje"},
+    {"no":10,"name":"Scapular push up","cat":"首・肩甲骨","purpose":"整える","url":"https://youtu.be/gpTEyZVnmuw?si=UWe0mXvj-mmn1nEn"},
+    {"no":11,"name":"Door stretch (大胸筋ストレッチ)","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/Dto3GWOyePY?si=1pp9LaVH0iftQ5h0"},
+    {"no":12,"name":"1st肩外旋ex","cat":"肩関節","purpose":"整える","url":"https://youtu.be/F5EPruRWf0Y?si=NfocUwmfN_irQ6Yx"},
+    {"no":13,"name":"1st肩外旋ex(チューブ)","cat":"肩関節","purpose":"整える","url":"https://youtu.be/B3G94o0sWvE?si=OODe4cArA4TyV5N8"},
+    {"no":14,"name":"棘上筋ex (チューブ)","cat":"肩関節","purpose":"整える","url":"https://youtu.be/5gpuzcBlV3Q?si=BjOUkEWdxx5tRTEl"},
+    {"no":15,"name":"テーブルサンディング","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/lcO-zu1y7EU?si=3tmZ0eMigzez-Gps"},
+    {"no":16,"name":"ウォールサンディング","cat":"肩関節","purpose":"伸ばす","url":"https://youtu.be/s71iDVRatzY?si=Q0v-ukYdF172J_o-"},
+    {"no":17,"name":"肩夜間ポジショニング","cat":"肩関節","purpose":"その他","url":"https://youtu.be/ZMrbB9kRQD0?si=62-dh-h8-ZstXNaN"},
+    {"no":18,"name":"羽ばたきエクササイズ","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/0AUJgBSmKHI?si=7VWZyBOP-tQfTQ_n"},
+    {"no":19,"name":"90-90 胸椎回旋ストレッチ","cat":"背中・腰","purpose":"伸ばす","url":"https://youtu.be/YAsjjG33nrc?si=-0F5wjVOhJLfKd0x"},
+    {"no":20,"name":"Rock Back Child Pose","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/LqRUg8vZ2uQ?si=XdxKECRz-owVgt29"},
+    {"no":21,"name":"腰椎・股関節屈曲ストレッチ","cat":"背中・腰","purpose":"伸ばす","url":"https://youtu.be/LASCvvHIxHk?si=eqgLOcFltXFD2_bz"},
+    {"no":22,"name":"Supine Hip Crossover Stretch","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/7l7yEVfYquE?si=EFd7KJAHsMTT1ML_"},
+    {"no":23,"name":"タオルプルダウン","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/Ye-eaCN12HQ?si=UYAMMtvjJYWVbQ-M"},
+    {"no":24,"name":"draw-in","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/UdV5EoAQ3LE?si=DjElMgkdUYOQMbZx"},
+    {"no":25,"name":"Cat & Cow","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/UAgP6cmxHjg?si=TIVxsiGbEtx5t6Vm"},
+    {"no":26,"name":"Bird Dog","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/BEIza1ZrleM?si=N3Fa4FIKrRj8dbC7"},
+    {"no":27,"name":"プランク","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/xp265PWiBVs?si=sgUqqbfrPFd355ss"},
+    {"no":28,"name":"Dead bug","cat":"背中・腰","purpose":"整える","url":"https://youtu.be/bhzrFvNMMjI?si=gASb8ggm1y6UAoDc"},
+    {"no":29,"name":"前腕屈筋群ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/KFiOSnYn580?si=sW8zw6bvfDrQTJNs"},
+    {"no":30,"name":"前腕伸筋群ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/9EN_jqoaCV8?si=6eDk5tgbz9i1m4YL"},
+    {"no":31,"name":"手内在筋ストレッチ","cat":"肘・手関節","purpose":"伸ばす","url":"https://youtu.be/pafuhvji0O0?si=3UxeULT8Y80_AUPj"},
+    {"no":32,"name":"腸腰筋ストレッチ","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/jFx97Qakq38?si=B1xpAg5tXOKh0YEZ"},
+    {"no":33,"name":"大腿直筋ストレッチ (腹臥位)","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/UlhsMKEhtBU?si=rSVIKpnLJknw8cpd"},
+    {"no":34,"name":"大殿筋ストレッチ(座位)","cat":"股関節","purpose":"伸ばす","url":"https://youtu.be/dZ9rFq_7iAc?si=bXT9KGIb2Ygeyp-0"},
+    {"no":35,"name":"クラムシェル","cat":"股関節","purpose":"整える","url":"https://youtu.be/X-n1U59dReE?si=GqResA0QqMO-XpkG"},
+    {"no":36,"name":"内転筋ボールex(座位)","cat":"股関節","purpose":"整える","url":"https://youtu.be/oGxDGpC1r0s?si=YVL2UaYZiSRPDnIy"},
+    {"no":37,"name":"Hip hinge (座位)","cat":"股関節","purpose":"整える","url":"https://youtu.be/hIQ9uz1kLuw?si=PHfMWxKubj9qqpFz"},
+    {"no":38,"name":"Single Leg Hip Lift","cat":"股関節","purpose":"整える","url":"https://youtu.be/Dhn1M9WFbKA?si=4UW3bG2OBuG-N-_w"},
+    {"no":39,"name":"大腿四頭筋遠位マッサージ","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/hYvgaE1m_to?si=NYxLJK777vkX8lb3"},
+    {"no":40,"name":"膝蓋下脂肪体マッサージ","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/_-20Ajo4PBk?si=kcyvjSlpy7bMX-CP"},
+    {"no":41,"name":"Patella mobilization","cat":"膝関節","purpose":"緩める","url":"https://youtu.be/1Uf6i3nmuzk?si=iA7usjd4olIxQUSE"},
+    {"no":42,"name":"Patella setting","cat":"膝関節","purpose":"整える","url":"https://youtu.be/RKGL6k09Y6w?si=WgiGmuUrW6ZU1c9m"},
+    {"no":43,"name":"Leg extention (ボール潰し)","cat":"膝関節","purpose":"整える","url":"https://youtu.be/y5XRWzpBPHI?si=aYMkSCntGwfVSKJy"},
+    {"no":44,"name":"SLR ex","cat":"膝関節","purpose":"整える","url":"https://youtu.be/4pt0TtprUho?si=ppKeyOPHohqdnjHY"},
+    {"no":45,"name":"下腿内旋ex","cat":"膝関節","purpose":"整える","url":"https://youtu.be/-qoRuNMfYEg?si=NGy8SmRjdYq3Jqjh"},
+    {"no":46,"name":"スクワット","cat":"膝関節","purpose":"整える","url":"https://youtu.be/QEC0pjaIwLU?si=qoVFWKZ3x2v_R_Pl"},
+    {"no":47,"name":"足趾ストレッチ","cat":"足関節","purpose":"伸ばす","url":"https://youtu.be/JjGSvSJG-YU?si=FJrosfuRu_Vjk8mK"},
+    {"no":48,"name":"足底リリース(ボール)","cat":"足関節","purpose":"緩める","url":"https://youtu.be/uNubDHXOMDM?si=adGph9hX6plZ9O0M"},
+    {"no":49,"name":"腓腹筋ストレッチ(タオル)","cat":"足関節","purpose":"伸ばす","url":"https://youtu.be/-fQHuD79sJQ?si=qj3EyYhaKdacM5Of"},
+    {"no":50,"name":"タオルギャザー","cat":"足関節","purpose":"整える","url":"https://youtu.be/gql7H6pQsdg?si=xqTKuc8US8X3bxg7"},
+    {"no":51,"name":"Toe-tap ex","cat":"足関節","purpose":"整える","url":"https://youtu.be/yQI3m4yDjME?si=ZHOnrm7AYKZ2mZN7"}
+  ];
+
+  var CATEGORY_ORDER = ["頸・肩甲骨","肩関節","背中・腰","肘・手関節","股関節","膝関節","足関節"];
+  // シート上の表記ゆれ(「首・肩甲骨」など)も同じ位置に並べる
+  var CATEGORY_ALIAS = { "首・肩甲骨":"頸・肩甲骨", "頚・肩甲骨":"頸・肩甲骨" };
+  var UNIT_CODE  = { "回":"r", "秒":"s" };
+  var UNIT_LABEL = { "r":"回", "s":"秒" };
+  var DEFAULT_REPS = 10, DEFAULT_SETS = 2, MAX_VALUE = 999, MAX_RX_ITEMS = 100;
+  var ERROR_TEXT = "処方内容を読み込めませんでした。お手数ですが、スタッフにリンクをもう一度発行してもらってください。";
+  var MAX_MESSAGE = 150;   // メッセージ(任意)の上限文字数
+  var MSG_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2l-1.4-1.3C5.4 15.2 2 12.1 2 8.4 2 5.3 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.3 22 8.4c0 3.7-3.4 6.8-8.6 11.5L12 21.2z"/></svg>';
+  var PATIENT_NOTE = "実施中に痛みが強くなった場合は中止し、担当者にご相談ください。";
+  var POPUP_BLOCKED_TEXT = "ポップアップがブロックされたため、印刷用ページを開けませんでした。ブラウザの設定でこのページのポップアップを許可してから、もう一度「印刷する(手渡し用)」を押してください。";
+
+  var EYE_ICON  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+
+  /* ===================== ユーティリティ ===================== */
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function pad2(n){ return String(n).padStart(2, "0"); }
+  function noLabel(n){ return "No." + pad2(n); }
+  function qtyText(s){ return s.reps + s.unit + " × " + s.sets + "セット"; }
+  function normalize(s){
+    s = String(s);
+    try { s = s.normalize("NFKC"); } catch(e){}
+    return s.toLowerCase();
+  }
+  function isHttpUrl(u){ return /^https?:\/\//i.test(u); }
+  function formatDate(d){
+    return d.getFullYear() + "/" + pad2(d.getMonth()+1) + "/" + pad2(d.getDate()) + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  }
+  function defaultUnitFor(purpose){ return (purpose === "伸ばす" || purpose === "緩める") ? "秒" : "回"; }
+  function categoryRank(cat){
+    var key = CATEGORY_ALIAS[cat] || cat;
+    return CATEGORY_ORDER.indexOf(key);
+  }
+
+  /* ===================== CSV ===================== */
+  // カンマ・ダブルクォート("" のエスケープ)・セル内改行に対応
+  function parseCSV(text){
+    var rows = [], row = [], field = "", inQuotes = false;
+    text = String(text || "");
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    for (var i = 0; i < text.length; i++){
+      var c = text[i];
+      if (inQuotes){
+        if (c === '"'){
+          if (text[i+1] === '"'){ field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"'){
+        inQuotes = true;
+      } else if (c === ","){
+        row.push(field); field = "";
+      } else if (c === "\r"){
+        if (text[i+1] === "\n") i++;
+        row.push(field); rows.push(row); row = []; field = "";
+      } else if (c === "\n"){
+        row.push(field); rows.push(row); row = []; field = "";
+      } else {
+        field += c;
+      }
+    }
+    if (field !== "" || row.length > 0){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  // 1行目は見出し。必須項目の欠け・http以外のURLは除外。番号重複は先の1件。番号の昇順。
+  function rowsToExercises(rows){
+    var seen = {}, out = [];
+    var hasPurpose = (rows[0] || []).length >= 5;
+    for (var i = 1; i < rows.length; i++){
+      var r = rows[i] || [];
+      var noStr   = String(r[0] == null ? "" : r[0]).trim();
+      var name    = String(r[1] == null ? "" : r[1]).trim();
+      var cat     = String(r[2] == null ? "" : r[2]).trim();
+      var purpose = hasPurpose ? String(r[3] == null ? "" : r[3]).trim() : "";
+      var urlCell = r[hasPurpose ? 4 : 3];
+      var url     = String(urlCell == null ? "" : urlCell).trim();
+      if (!noStr || !name || !cat || !url) continue;
+      if (!/^https?:/i.test(url) || !isHttpUrl(url)) continue;
+      if (!/^\d+(\.0+)?$/.test(noStr)) continue;
+      var no = parseInt(noStr, 10);
+      if (!(no > 0) || seen[no]) continue;
+      seen[no] = true;
+      out.push({ no:no, name:name, cat:cat, purpose:purpose, url:url });
+    }
+    out.sort(function(a, b){ return a.no - b.no; });
+    return out;
+  }
+
+  /* ===================== スプレッドシート取得 ===================== */
+  function csvChannel(url){
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var opts = { cache:"no-store" };
+    if (ctrl) opts.signal = ctrl.signal;
+    var promise = Promise.resolve().then(function(){ return fetch(url, opts); }).then(function(res){
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.text();
+    }).then(function(text){ return parseCSV(text); });
+    return { promise: promise, cancel: function(){ if (ctrl) { try { ctrl.abort(); } catch(e){} } } };
+  }
+
+  // gviz の JSON(表形式)を CSV と同じ「行の配列」に変換する。1行目は見出し
+  function gvizTableToRows(data){
+    if (!data || data.status === "error" || !data.table) throw new Error("gviz error");
+    var t = data.table;
+    var head = (t.cols || []).map(function(c){ return c && c.label ? c.label : ""; });
+    var rows = (t.rows || []).map(function(r){
+      return (r && r.c ? r.c : []).map(function(c){
+        return (c == null || c.v == null) ? "" : String(c.v);
+      });
+    });
+    return [head].concat(rows);
+  }
+
+  var jsonpSeq = 0;
+  function jsonpChannel(){
+    var name = "__selfCareSheet" + (++jsonpSeq) + "_" + Date.now();
+    var script = document.createElement("script");
+    function cleanup(){
+      window[name] = function(){};   // 遅れて届いても何もしない
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    var promise = new Promise(function(resolve, reject){
+      window[name] = function(data){
+        cleanup();
+        try { resolve(gvizTableToRows(data)); } catch(e){ reject(e); }
+      };
+      script.onerror = function(){ cleanup(); reject(new Error("script error")); };
+      script.async = true;
+      script.src = SHEET_JSONP_URL + name + "&_=" + Date.now();
+      (document.head || document.documentElement).appendChild(script);
+    });
+    return { promise: promise, cancel: cleanup };
+  }
+
+  // 2つの方法(gviz CSV / JSONP)を同時に試し、先に正しく読めたものを使う。
+  // すべて失敗、または ms を過ぎたら失敗扱い。
+  function fetchSheetList(ms){
+    return new Promise(function(resolve, reject){
+      var channels = [], done = false, pending, lastErr = null;
+      function finish(){
+        done = true;
+        clearTimeout(timer);
+        channels.forEach(function(ch){ try { ch.cancel(); } catch(e){} });
+      }
+      var timer = setTimeout(function(){ if (done) return; finish(); reject(new Error("timeout")); }, ms);
+      SHEET_URLS.forEach(function(url){ channels.push(csvChannel(url)); });
+      try { channels.push(jsonpChannel()); } catch(e){}
+      pending = channels.length;
+      channels.forEach(function(ch){
+        ch.promise.then(function(rows){
+          var list = rowsToExercises(rows);
+          if (list.length === 0) throw new Error("有効な行がありません");
+          if (done) return;
+          finish();
+          resolve(list);
+        }).catch(function(err){
+          lastErr = err;
+          if (done) return;
+          if (--pending === 0){ finish(); reject(lastErr); }
+        });
+      });
+    });
+  }
+
+  var state = {
+    exercises: BUILTIN_EXERCISES.slice(),
+    source: "builtin",     // "sheet" | "builtin"
+    syncedAt: null,        // 最後に同期できた日時
+    lastAttemptAt: null,   // 最後に取得を試みた日時
+    lastRefreshFailed: false,
+    refreshing: null
+  };
+
+  function warn(msg, err){
+    if (window.console && console.warn) console.warn(msg, err && err.message);
+  }
+
+  // 起動時:失敗したら組み込みデータ
+  function loadExercises(){
+    state.lastAttemptAt = new Date();
+    return fetchSheetList(FETCH_TIMEOUT_MS).then(function(list){
+      state.exercises = list;
+      state.source = "sheet";
+      state.syncedAt = new Date();
+      state.lastRefreshFailed = false;
+    }).catch(function(err){
+      state.exercises = BUILTIN_EXERCISES.slice();
+      state.source = "builtin";
+      warn("スプレッドシートを取得できませんでした:", err);
+    });
+  }
+
+  // 自動更新:失敗しても今の表示はそのまま。{ ok, changed } を返す
+  function refreshExercises(){
+    if (state.refreshing) return state.refreshing;
+    state.lastAttemptAt = new Date();
+    state.refreshing = fetchSheetList(FETCH_TIMEOUT_MS).then(function(list){
+      var changed = JSON.stringify(list) !== JSON.stringify(state.exercises);
+      state.exercises = list;
+      state.source = "sheet";
+      state.syncedAt = new Date();
+      state.lastRefreshFailed = false;
+      return { ok:true, changed:changed };
+    }, function(err){
+      state.lastRefreshFailed = true;
+      warn("スプレッドシートの再取得に失敗しました:", err);
+      return { ok:false, changed:false };
+    }).then(function(r){ state.refreshing = null; return r; });
+    return state.refreshing;
+  }
+
+  /* ===================== 処方文字列 ===================== */
+  // 形式: 番号-回数-セット数-単位コード(r=回, s=秒)をカンマ区切り(番号順)
+  function buildRxString(selections){
+    return selections.slice().sort(function(a, b){ return a.no - b.no; }).map(function(s){
+      return s.no + "-" + s.reps + "-" + s.sets + "-" + (UNIT_CODE[s.unit] || "r");
+    }).join(",");
+  }
+
+  // 3項目の古い形式は「回」とみなす。無効な要素は無視する。
+  function parseRxString(str, exercises){
+    var out = [];
+    if (typeof str !== "string" || !str) return out;
+    var map = {};
+    exercises.forEach(function(e){ map[e.no] = e; });
+    var parts = str.split(",");
+    for (var i = 0; i < parts.length && out.length < MAX_RX_ITEMS; i++){
+      var part = parts[i].trim();
+      if (!part) continue;
+      var b = part.split("-");
+      if (b.length !== 3 && b.length !== 4) continue;
+      if (!/^\d{1,5}$/.test(b[0]) || !/^\d{1,4}$/.test(b[1]) || !/^\d{1,4}$/.test(b[2])) continue;
+      var unit = "回";
+      if (b.length === 4){
+        var code = b[3].toLowerCase();
+        if (!Object.prototype.hasOwnProperty.call(UNIT_LABEL, code)) continue;
+        unit = UNIT_LABEL[code];
+      }
+      var no = parseInt(b[0], 10), reps = parseInt(b[1], 10), sets = parseInt(b[2], 10);
+      if (!(reps > 0) || !(sets > 0)) continue;
+      var ex = map[no];
+      if (!ex) continue;
+      out.push({ no:ex.no, name:ex.name, url:ex.url, reps:reps, sets:sets, unit:unit });
+    }
+    return out;
+  }
+
+  // 処方リンクの土台になるURL。スマートフォンで開けない場合(パソコンのファイルなど)は null
+  function linkBase(){
+    var pub = String(PUBLIC_URL || "").trim();
+    if (/^https?:\/\//i.test(pub)) return pub.split("#")[0].split("?")[0];
+    if (/^https?:$/i.test(window.location.protocol)) return window.location.origin + window.location.pathname;
+    return null;
+  }
+  function buildRxLink(rx, message){
+    var base = linkBase();
+    if (!base) return null;
+    // カンマはURLにそのまま使える文字なので %2C に変換しない(QRコードを小さく・読みやすくするため)
+    var m = encodeMessage(message);
+    return base + "?rx=" + encodeURIComponent(rx).replace(/%2C/gi, ",") + (m ? "&m=" + m : "");
+  }
+
+
+  /* ===================== メッセージ(任意) ===================== */
+  // 改行をそろえ、制御文字を除き、前後の空白を取り、上限文字数で切る
+  function cleanMessage(text){
+    var t = String(text == null ? "" : text).replace(/\r\n?/g, "\n")
+      .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202E\u2060-\u2064\uFEFF]/g, "")
+      .replace(/[ \t　]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    var chars = Array.from(t);
+    if (chars.length > MAX_MESSAGE) t = chars.slice(0, MAX_MESSAGE).join("").trim();
+    return t;
+  }
+  // リンクに入れるため、文字(UTF-16)を URL で使える Base64(- と _)にする。
+  // 日本語は1文字が約2.7文字になり、UTF-8 より短く、QRコードが細かくなりにくい
+  function encodeMessage(text){
+    var t = cleanMessage(text);
+    if (!t) return "";
+    var bin = "";
+    for (var i = 0; i < t.length; i++){
+      var c = t.charCodeAt(i);
+      bin += String.fromCharCode(c >> 8, c & 255);
+    }
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  // 読めないときは ""(メッセージなし)
+  function decodeMessage(str){
+    if (typeof str !== "string" || !str || str.length > 1200 || !/^[A-Za-z0-9_-]+$/.test(str)) return "";
+    try {
+      var b64 = str.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      var bin = atob(b64), out = "";
+      if (bin.length % 2) return "";
+      for (var i = 0; i < bin.length; i += 2) out += String.fromCharCode((bin.charCodeAt(i) << 8) | bin.charCodeAt(i + 1));
+      // 対になっていないサロゲート(壊れた文字)があれば無効
+      if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(out)) return "";
+      return cleanMessage(out);
+    } catch(e){ return ""; }
+  }
+
+  /* ===================== 共通 ===================== */
+  // メインカラーから、濃い色(押したとき)と薄い色(選択中の背景)を作る
+  function mixColor(hex, target, t){
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
+    if (!m) return null;
+    var n = parseInt(m[1], 16), out = "#";
+    [16, 8, 0].forEach(function(sh, k){
+      var v = (n >> sh) & 255;
+      v = Math.round(v + (target[k] - v) * t);
+      out += ("0" + v.toString(16)).slice(-2);
+    });
+    return out.toUpperCase();
+  }
+  function applyMainColor(){
+    var base = mixColor(MAIN_COLOR, [0,0,0], 0);
+    if (!base) return;
+    var root = document.documentElement.style;
+    root.setProperty("--accent", base);
+    root.setProperty("--accent-dark", mixColor(base, [0,0,0], 0.25));
+    root.setProperty("--accent-soft", mixColor(base, [255,255,255], 0.91));
+  }
+  function accentColor(){ return mixColor(MAIN_COLOR, [0,0,0], 0) || "#2E2E40"; }
+  function hasLogoImage(){ return /^data:image\//i.test(String(LOGO_DATA_URI || "")); }
+  function setLogos(){
+    var imgs = document.querySelectorAll("img[data-logo]");
+    for (var i = imgs.length - 1; i >= 0; i--){
+      if (hasLogoImage()){
+        imgs[i].src = LOGO_DATA_URI;
+        imgs[i].alt = CLINIC_NAME;
+      } else {
+        // ロゴ画像がないときは事業所名を文字で表示
+        var span = document.createElement("span");
+        span.className = "clinic-logo-text";
+        span.textContent = CLINIC_NAME;
+        imgs[i].parentNode.replaceChild(span, imgs[i]);
+      }
+    }
+  }
+  function hideLoading(){
+    var el = document.getElementById("loadingScreen");
+    if (el) el.hidden = true;
+    if (el) el.style.display = "none";
+  }
+
+  /* ===================== スタッフ用画面 ===================== */
+  function groupExercises(list){
+    var byCat = {}, extra = [];
+    list.forEach(function(e){
+      if (!byCat[e.cat]) {
+        byCat[e.cat] = [];
+        if (categoryRank(e.cat) === -1) extra.push(e.cat);
+      }
+      byCat[e.cat].push(e);
+    });
+    var known = Object.keys(byCat).filter(function(c){ return categoryRank(c) !== -1; })
+      .sort(function(a, b){ return categoryRank(a) - categoryRank(b); });
+    return known.concat(extra).map(function(cat){
+      return { cat:cat, items: byCat[cat].slice().sort(function(a, b){ return a.no - b.no; }) };
+    });
+  }
+
+  function initStaffView(){
+    var view = document.getElementById("staffView");
+    var bar = document.getElementById("selectionBar");
+    var list = document.getElementById("checklist");
+    var search = document.getElementById("searchBox");
+    var noHit = document.getElementById("noHit");
+    var resultPanel = document.getElementById("resultPanel");
+    var genBtn = document.getElementById("generateBtn");
+    var resetBtn = document.getElementById("resetBtn");
+    var selCount = document.getElementById("selCount");
+    view.hidden = false;
+    bar.hidden = false;
+    document.body.classList.add("has-bar");
+
+    var status = document.getElementById("dataStatus");
+    var refreshBtn = document.getElementById("refreshBtn");
+
+    function renderStatus(){
+      if (state.source === "sheet"){
+        var t = "スプレッドシートと同期しました(" + state.exercises.length + "件 / " + formatDate(state.syncedAt) + ")";
+        if (state.lastRefreshFailed) t += "。最新の取得に失敗したため、この時点の内容を表示しています";
+        status.textContent = t;
+        status.classList.toggle("is-fallback", state.lastRefreshFailed);
+      } else {
+        status.textContent = "スプレッドシートを取得できなかったため、組み込みデータ(" + state.exercises.length + "件)を表示しています";
+        status.classList.add("is-fallback");
+      }
+    }
+
+    function rowHtml(ex){
+      var unit = defaultUnitFor(ex.purpose);
+      var id = "chk" + ex.no;
+      return '<div class="ex-row" data-no="' + ex.no + '" data-name="' + esc(normalize(ex.name)) + '">' +
+        '<input type="checkbox" id="' + id + '" data-no="' + ex.no + '">' +
+        '<span class="ex-no">' + noLabel(ex.no) + '</span>' +
+        '<label class="ex-main" for="' + id + '">' +
+          '<span class="ex-name">' + esc(ex.name) + '</span>' +
+          '<span class="ex-tag">' + esc(ex.cat) + (ex.purpose ? ' / ' + esc(ex.purpose) : "") + '</span>' +
+        '</label>' +
+        '<a class="ex-eye" href="' + esc(ex.url) + '" target="_blank" rel="noopener noreferrer" title="動画を確認する" aria-label="' + esc(ex.name) + 'の動画を確認する">' + EYE_ICON + '</a>' +
+        '<div class="ex-qty">' +
+          '<label class="qty-field"><span>回数または秒数</span><span class="qty-line">' +
+            '<input type="number" class="qty-input qty-reps" inputmode="numeric" min="1" max="' + MAX_VALUE + '" value="' + DEFAULT_REPS + '">' +
+            '<select class="qty-unit" data-default="' + unit + '" aria-label="単位">' +
+              '<option value="回"' + (unit === "回" ? " selected" : "") + '>回</option>' +
+              '<option value="秒"' + (unit === "秒" ? " selected" : "") + '>秒</option>' +
+            '</select></span></label>' +
+          '<label class="qty-field"><span>セット数</span><span class="qty-line">' +
+            '<input type="number" class="qty-input qty-sets" inputmode="numeric" min="1" max="' + MAX_VALUE + '" value="' + DEFAULT_SETS + '">' +
+            '<span class="qty-suffix">セット</span></span></label>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // 一覧を描き直す。選択中の種目と入力値は番号ごとに引き継ぐ
+    function renderChecklist(){
+      var keep = {};
+      list.querySelectorAll(".ex-row").forEach(function(row){
+        var c = row.querySelector('input[type="checkbox"]');
+        if (!c.checked) return;
+        keep[row.getAttribute("data-no")] = {
+          reps: row.querySelector(".qty-reps").value,
+          sets: row.querySelector(".qty-sets").value,
+          unit: row.querySelector(".qty-unit").value
+        };
+      });
+      var html = "";
+      groupExercises(state.exercises).forEach(function(g){
+        html += '<section class="cat-group" data-cat="' + esc(g.cat) + '">' +
+          '<h2 class="cat-title">' + esc(g.cat) + '<span class="cat-count">' + g.items.length + '</span></h2>' +
+          g.items.map(rowHtml).join("") +
+        '</section>';
+      });
+      list.innerHTML = html;
+      Object.keys(keep).forEach(function(no){
+        var row = list.querySelector('.ex-row[data-no="' + no + '"]');
+        if (!row) return;
+        row.querySelector('input[type="checkbox"]').checked = true;
+        row.classList.add("is-checked");
+        row.querySelector(".qty-reps").value = keep[no].reps;
+        row.querySelector(".qty-sets").value = keep[no].sets;
+        row.querySelector(".qty-unit").value = keep[no].unit;
+      });
+      applySearch();
+      updateCount();
+    }
+
+    function refreshNow(){
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = "更新中…";
+      return refreshExercises().then(function(r){
+        if (r.changed) renderChecklist();
+        renderStatus();
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = "今すぐ更新";
+        return r;
+      });
+    }
+    refreshBtn.addEventListener("click", refreshNow);
+
+    // 開いたままでも定期的に読み直す(画面が見えているときだけ)
+    setInterval(function(){
+      if (document.visibilityState === "hidden") return;
+      refreshNow();
+    }, AUTO_REFRESH_MS);
+    // 別のタブやアプリから戻ってきたとき・通信が回復したときにも読み直す
+    document.addEventListener("visibilitychange", function(){
+      if (document.visibilityState !== "visible") return;
+      if (state.lastAttemptAt && (Date.now() - state.lastAttemptAt.getTime()) < REFRESH_ON_RETURN_MS) return;
+      refreshNow();
+    });
+    window.addEventListener("online", function(){ refreshNow(); });
+    window.SelfCareRx.refresh = refreshNow;
+
+    function updateCount(){
+      var n = list.querySelectorAll('input[type="checkbox"]:checked').length;
+      selCount.textContent = n;
+      genBtn.disabled = (n === 0);
+    }
+
+    list.addEventListener("change", function(e){
+      var t = e.target;
+      if (t.matches('input[type="checkbox"]')){
+        t.closest(".ex-row").classList.toggle("is-checked", t.checked);
+        updateCount();
+      }
+    });
+
+    function applySearch(){
+      var q = normalize(search.value.trim());
+      var anyVisible = false;
+      list.querySelectorAll(".cat-group").forEach(function(group){
+        var visible = 0;
+        group.querySelectorAll(".ex-row").forEach(function(row){
+          var match = !q || row.getAttribute("data-name").indexOf(q) !== -1;
+          row.hidden = !match;
+          if (match) visible++;
+        });
+        group.hidden = (visible === 0);
+        if (visible) anyVisible = true;
+      });
+      noHit.hidden = anyVisible;
+    }
+    search.addEventListener("input", applySearch);
+
+    function readInt(input, fallback){
+      var v = parseInt(input.value, 10);
+      if (!(v > 0)) v = fallback;
+      if (v > MAX_VALUE) v = MAX_VALUE;
+      input.value = v;
+      return v;
+    }
+
+    function collectSelections(){
+      var out = [];
+      state.exercises.forEach(function(ex){
+        var row = list.querySelector('.ex-row[data-no="' + ex.no + '"]');
+        if (!row) return;
+        var chk = row.querySelector('input[type="checkbox"]');
+        if (!chk.checked) return;
+        out.push({
+          no: ex.no, name: ex.name, url: ex.url,
+          reps: readInt(row.querySelector(".qty-reps"), DEFAULT_REPS),
+          sets: readInt(row.querySelector(".qty-sets"), DEFAULT_SETS),
+          unit: row.querySelector(".qty-unit").value === "秒" ? "秒" : "回"
+        });
+      });
+      return out.sort(function(a, b){ return a.no - b.no; });
+    }
+
+    genBtn.addEventListener("click", function(){
+      var sel = collectSelections();
+      if (!sel.length) return;
+      renderResult(sel);
+    });
+
+    resetBtn.addEventListener("click", function(){
+      list.querySelectorAll(".ex-row").forEach(function(row){
+        row.classList.remove("is-checked");
+        row.hidden = false;
+        row.querySelector('input[type="checkbox"]').checked = false;
+        row.querySelector(".qty-reps").value = DEFAULT_REPS;
+        row.querySelector(".qty-sets").value = DEFAULT_SETS;
+        var u = row.querySelector(".qty-unit");
+        u.value = u.getAttribute("data-default");
+      });
+      list.querySelectorAll(".cat-group").forEach(function(g){ g.hidden = false; });
+      search.value = "";
+      noHit.hidden = true;
+      resultPanel.hidden = true;
+      document.getElementById("linkOutput").value = "";
+      document.getElementById("qrBox").innerHTML = "";
+      document.getElementById("previewList").innerHTML = "";
+      document.getElementById("copyFeedback").textContent = "";
+      document.getElementById("printMsg").hidden = true;
+      document.getElementById("msgInput").value = "";
+      updateMsgCount();
+      updateCount();
+      try { window.scrollTo({ top:0, behavior:"smooth" }); } catch(e){ try { window.scrollTo(0, 0); } catch(e2){} }
+    });
+
+    // メッセージ:入力するとリンクとQRコードを作り直す
+    var msgInput = document.getElementById("msgInput");
+    var msgTimer = null;
+    msgInput.addEventListener("input", function(){
+      updateMsgCount();
+      clearTimeout(msgTimer);
+      msgTimer = setTimeout(function(){ if (currentResult) updateLink(); }, 350);
+    });
+    updateMsgCount();
+
+    document.getElementById("localNote").hidden = !!linkBase();
+    renderStatus();
+    renderChecklist();
+  }
+
+  // QRコードの白い余白(モジュール数)。読み取りに必要
+  var QR_QUIET = 4;
+  var lastQR = null;   // 印刷用に、最後に作ったQRコードの情報を保持
+
+  // qrcodejs で符号化だけ行い、マス目(isDark)の情報を取り出す
+  function makeQRMatrix(text){
+    var tmp = document.createElement("div");
+    var q = new QRCode(tmp, { text:text, width:64, height:64, correctLevel:QRCode.CorrectLevel.M });
+    var m = q && q._oQRCode;
+    if (!m || typeof m.getModuleCount !== "function") return null;
+    return m;
+  }
+
+  // マス目を整数倍の大きさで、余白つきでくっきり描く
+  function drawQRCanvas(matrix, pxPerModule){
+    var n = matrix.getModuleCount(), total = n + QR_QUIET * 2;
+    var c = document.createElement("canvas");
+    var ctx = c.getContext && c.getContext("2d");
+    if (!ctx) return null;
+    c.width = c.height = total * pxPerModule;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#000000";
+    for (var r = 0; r < n; r++){
+      for (var k = 0; k < n; k++){
+        if (matrix.isDark(r, k)) ctx.fillRect((k + QR_QUIET) * pxPerModule, (r + QR_QUIET) * pxPerModule, pxPerModule, pxPerModule);
+      }
+    }
+    return c;
+  }
+
+  function renderQR(box, text){
+    box.innerHTML = "";
+    box.style.width = box.style.height = "";
+    lastQR = null;
+    if (typeof QRCode === "undefined"){
+      box.innerHTML = '<p style="font-size:12px;color:#5A5A5A;padding:8px;margin:0;">QRコードを表示できませんでした。通信環境をご確認ください。</p>';
+      return false;
+    }
+    try {
+      var matrix = makeQRMatrix(text);
+      var canvas = null, total = 0;
+      if (matrix){
+        total = matrix.getModuleCount() + QR_QUIET * 2;
+        // 1マスが画面上で3px以上になるように表示サイズを決める(最小150px・最大300px)
+        var css = Math.max(150, Math.min(300, total * 3));
+        var dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        canvas = drawQRCanvas(matrix, Math.max(2, Math.ceil(css * dpr / total)));
+        if (canvas){
+          canvas.style.width = canvas.style.height = css + "px";
+          canvas.setAttribute("role", "img");
+          canvas.setAttribute("aria-label", "処方リンクのQRコード");
+          box.style.width = box.style.height = css + "px";
+          box.appendChild(canvas);
+          lastQR = { matrix: matrix, total: total };
+          return true;
+        }
+      }
+      // canvas が使えない環境では、ライブラリ標準の描画にする
+      new QRCode(box, { text:text, width:150, height:150, colorDark:"#000000", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.M });
+      return true;
+    } catch(e){
+      box.innerHTML = '<p style="font-size:12px;color:#5A5A5A;padding:8px;margin:0;">QRコードを作成できませんでした。</p>';
+      return false;
+    }
+  }
+
+  function updateMsgCount(){
+    var el = document.getElementById("msgCount");
+    var n = Array.from(document.getElementById("msgInput").value).length;
+    el.textContent = Math.min(n, MAX_MESSAGE) + "/" + MAX_MESSAGE;
+    el.classList.toggle("is-full", n >= MAX_MESSAGE);
+  }
+  function currentMessage(){ return cleanMessage(document.getElementById("msgInput").value); }
+
+  var currentResult = null;   // { sel, link }
+  // リンクとQRコードを(メッセージを含めて)作る
+  function updateLink(){
+    var sel = currentResult.sel;
+    var link = buildRxLink(buildRxString(sel), currentMessage());
+    var linkOut = document.getElementById("linkOutput");
+    var qrBox = document.getElementById("qrBox");
+    currentResult.link = link;
+    document.getElementById("copyFeedback").textContent = "";
+    document.getElementById("localWarn").hidden = !!link;
+    document.getElementById("resultTitle").textContent = link ? "処方リンクを作成しました" : "処方内容(リンクは未作成)";
+    document.getElementById("linkArea").hidden = !link;
+    if (link){
+      linkOut.value = link;
+      renderQR(qrBox, link);
+      // 画面で1マス3pxを保てない(300pxに収まらない)ほど細かいとき
+      document.getElementById("qrDense").hidden = !(lastQR && lastQR.total * 3 > 300);
+    } else {
+      linkOut.value = "";
+      qrBox.innerHTML = "";
+      lastQR = null;
+      document.getElementById("qrDense").hidden = true;
+    }
+  }
+
+  function renderResult(sel){
+    var panel = document.getElementById("resultPanel");
+    var linkOut = document.getElementById("linkOutput");
+    var qrBox = document.getElementById("qrBox");
+    var fb = document.getElementById("copyFeedback");
+    var printMsg = document.getElementById("printMsg");
+
+    printMsg.hidden = true;
+    currentResult = { sel: sel, link: null };
+    updateLink();
+
+    document.getElementById("previewList").innerHTML = sel.map(function(s){
+      return '<li class="preview-item"><span class="ex-no">' + noLabel(s.no) + '</span>' +
+        '<span class="ex-name">' + esc(s.name) + '</span>' +
+        '<span class="qty-badge">' + esc(qtyText(s)) + '</span></li>';
+    }).join("");
+
+    panel.hidden = false;
+    try { panel.scrollIntoView({ behavior:"smooth", block:"start" }); } catch(e){}
+
+    document.getElementById("copyBtn").onclick = function(){
+      var link = currentResult && currentResult.link;
+      if (!link) return;
+      copyText(link, linkOut).then(function(ok){
+        fb.textContent = ok ? "コピーしました" : "コピーできませんでした。リンクを長押しして選択してください。";
+        clearTimeout(fb._t);
+        fb._t = setTimeout(function(){ fb.textContent = ""; }, 2500);
+      });
+    };
+    document.getElementById("printBtn").onclick = function(){
+      var ok = openPrintPage(sel, currentResult.link, qrBox, currentMessage());
+      printMsg.textContent = POPUP_BLOCKED_TEXT;
+      printMsg.hidden = ok;
+    };
+  }
+
+  function copyText(text, input){
+    function legacy(){
+      try {
+        input.focus(); input.select();
+        if (input.setSelectionRange) input.setSelectionRange(0, text.length);
+        return !!(document.execCommand && document.execCommand("copy"));
+      } catch(e){ return false; }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext !== false){
+      return navigator.clipboard.writeText(text).then(function(){ return true; }, function(){ return legacy(); });
+    }
+    return Promise.resolve(legacy());
+  }
+
+  /* ===================== 印刷用ページ ===================== */
+  function qrMarkupFor(qrBox){
+    // 印刷用:1マス0.45mm以上(30〜55mm)で、高解像度の画像を作る
+    if (lastQR){
+      var mm = Math.max(30, Math.min(55, Math.round(lastQR.total * 0.45)));
+      var c = drawQRCanvas(lastQR.matrix, 10);
+      if (c){
+        try { return '<img class="qr-img" src="' + c.toDataURL("image/png") + '" alt="QRコード" style="width:' + mm + 'mm;height:' + mm + 'mm;image-rendering:pixelated;">'; } catch(e){}
+      }
+    }
+    var canvas = qrBox.querySelector("canvas");
+    if (canvas){
+      try { return '<img src="' + canvas.toDataURL("image/png") + '" alt="QRコード">'; } catch(e){}
+    }
+    var img = qrBox.querySelector("img");
+    if (img && img.getAttribute("src")) return '<img src="' + esc(img.getAttribute("src")) + '" alt="QRコード">';
+    var table = qrBox.querySelector("table");
+    if (table) return '<div class="qr-table">' + table.outerHTML + '</div>';
+    return "";
+  }
+
+  function buildPrintHtml(sel, link, qrMarkup, message){
+    message = cleanMessage(message);
+    var tight = sel.length > 20 && !!message;
+    var compact = sel.length > 12, dense = sel.length > 20;
+    var accent = accentColor();
+    var rows = sel.map(function(s){
+      return '<tr><td class="c-no">' + noLabel(s.no) + '</td><td>' + esc(s.name) + '</td>' +
+        '<td class="c-num">' + s.reps + ' ' + s.unit + '</td><td class="c-num">' + s.sets + ' セット</td></tr>';
+    }).join("");
+    return '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<meta name="referrer" content="no-referrer">' +
+      '<title>セルフケアエクササイズ プログラム</title>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">' +
+      '<style>' +
+      '@page{ size:A4 portrait; margin:12mm 14mm; }' +
+      '*{ box-sizing:border-box; }' +
+      'html,body{ margin:0; padding:0; }' +
+      'body{ font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif; color:#161616; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }' +
+      '.sheet{ max-width:182mm; margin:0 auto; padding:20px 0; }' +
+      '.logo{ height:34px; width:auto; display:block; margin:0 0 10px; }' +
+      '.logo-text{ display:block; font-size:18px; font-weight:900; line-height:34px; color:' + accent + '; letter-spacing:.04em; margin:0 0 10px; }' +
+      'h1{ font-size:19px; font-weight:900; margin:0 0 12px; padding-bottom:8px; border-bottom:2px solid #161616; }' +
+      'h1 span{ color:' + accent + '; }' +
+      '.blanks{ display:flex; gap:28px; flex-wrap:wrap; font-size:14px; margin:12px 0 14px; }' +
+      '.blank{ display:flex; align-items:flex-end; gap:6px; }' +
+      '.blank i{ font-style:normal; display:inline-block; border-bottom:1px solid #161616; min-width:58mm; height:22px; }' +
+      '.blank.date i{ min-width:44mm; }' +
+      'table{ width:100%; border-collapse:collapse; font-size:' + (dense ? '10.5px' : compact ? '12px' : '13.5px') + '; }' +
+      'th,td{ border:1px solid #161616; padding:' + (dense ? '1.5px 6px' : compact ? '4px 7px' : '7px 9px') + '; text-align:left; vertical-align:middle; line-height:1.4; }' +
+      (dense ? '.logo{ height:26px; margin-bottom:6px; } .logo-text{ font-size:15px; line-height:26px; margin-bottom:6px; } h1{ font-size:16px; margin-bottom:6px; } .blanks{ margin:6px 0 8px; } .qr-area{ margin-top:8px !important; padding:6px 10px !important; } .qr-table{ width:24mm !important; height:24mm !important; } .caution{ margin-top:8px !important; padding:6px 10px !important; font-size:10.5px !important; line-height:1.5 !important; }' : '') +
+      'th{ font-size:11.5px; font-weight:700; background:#F6F6F6; }' +
+      '.c-no{ font-family:"JetBrains Mono",monospace; white-space:nowrap; width:16mm; }' +
+      '.c-num{ font-family:"JetBrains Mono",monospace; text-align:center; white-space:nowrap; width:30mm; }' +
+      '.qr-area{ display:flex; gap:14px; align-items:center; margin:14px 0 0; padding:10px 12px; border:1px solid #161616; page-break-inside:avoid; break-inside:avoid; }' +
+      '.qr-area img{ width:30mm; height:30mm; flex-shrink:0; display:block; }' +
+      '.qr-area img.qr-img{ flex-shrink:0; }' +
+      '.qr-table{ flex-shrink:0; width:30mm; } .qr-table table{ width:30mm !important; height:30mm !important; border:0; } .qr-table td{ border:0 !important; padding:0 !important; }' +
+      '.qr-text{ font-size:11.5px; line-height:1.6; margin:0; }' +
+      '.qr-url{ display:block; font-family:"JetBrains Mono",monospace; font-size:10px; word-break:break-all; margin-top:4px; color:#161616; }' +
+      '.caution{ margin:14px 0 0; padding:10px 12px; border:1px solid ' + accent + '; font-size:11.5px; line-height:1.7; page-break-inside:avoid; break-inside:avoid; }' +
+      '.caution b{ color:' + accent + '; display:block; margin-bottom:2px; }' +
+      '.caution ol{ margin:0; padding-left:1.4em; }' +
+      '.msg{ margin:0 0 14px; padding:10px 14px; border:1.5px solid ' + accent + '; border-radius:6px; page-break-inside:avoid; break-inside:avoid; }' +
+      '.msg b{ display:block; font-size:11.5px; color:' + accent + '; letter-spacing:.04em; margin-bottom:3px; }' +
+      '.msg p{ margin:0; font-size:' + (dense ? '12px' : '13.5px') + '; font-weight:700; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }' +
+      (dense ? '.msg{ margin-bottom:8px; padding:6px 12px; }' : '') +
+      // 種目が多く、メッセージもあるときは、さらに詰めて1枚に収める
+      (tight ? '@page{ margin:9mm 12mm; } table{ font-size:10px; } th,td{ padding:1px 6px; line-height:1.25; } th{ font-size:10px; }' +
+        '.msg{ margin-bottom:6px; padding:4px 10px; } .msg b{ font-size:10px; margin-bottom:1px; } .msg p{ font-size:11px; line-height:1.5; }' +
+        '.logo-text{ font-size:14px; line-height:22px; margin-bottom:4px; } .logo{ height:22px; margin-bottom:4px; } h1{ font-size:15px; margin-bottom:4px; padding-bottom:5px; } .blanks{ margin:4px 0 6px; font-size:12.5px; }' +
+        '.qr-area{ margin-top:6px !important; padding:5px 10px !important; } .caution{ margin-top:6px !important; padding:5px 10px !important; font-size:10px !important; line-height:1.45 !important; }' : '') +
+      '.print-btn{ margin:18px 0 0; min-height:48px; padding:0 28px; font-size:15px; font-weight:700; font-family:inherit; color:#fff; background:' + accent + '; border:0; border-radius:8px; cursor:pointer; }' +
+      '@media print{ .print-btn{ display:none !important; } .sheet{ padding:0; } }' +
+      '</style></head><body><div class="sheet">' +
+      (hasLogoImage() ? '<img class="logo" src="' + LOGO_DATA_URI + '" alt="' + esc(CLINIC_NAME) + '">' : '<span class="logo-text">' + esc(CLINIC_NAME) + '</span>') +
+      '<h1>セルフケアエクササイズ <span>プログラム</span></h1>' +
+      '<div class="blanks">' +
+        '<div class="blank">お名前<i></i>様</div>' +
+        '<div class="blank date">処方日<i></i></div>' +
+      '</div>' +
+      (message ? '<div class="msg"><b>担当者からのメッセージ</b><p>' + esc(message) + '</p></div>' : '') +
+      '<table><thead><tr><th>No.</th><th>種目名</th><th>回数または秒数</th><th>セット数</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      (!link ? '' : '<div class="qr-area">' + (qrMarkup || '') +
+        '<p class="qr-text">スマートフォンのカメラでQRコードを読み取るか、下のURLを開くと、動画つきで内容を確認できます。' +
+        '<span class="qr-url">' + esc(link) + '</span></p></div>') +
+      '<div class="caution"><b>エクササイズを行う際の注意</b><ol>' +
+        '<li>痛みが強いときは、エクササイズを行わないでください。</li>' +
+        '<li>実施中に痛み・しびれなどの症状の変化があった場合は、すぐにエクササイズを中止してください。</li>' +
+        '<li>症状が続く場合は自己判断で再開せず、医師にご相談いただくか、次回の診察・リハビリ時に担当者へお伝えください。</li>' +
+      '</ol></div>' +
+      '<button type="button" class="print-btn" onclick="window.print()">この画面を印刷する</button>' +
+      '</div></body></html>';
+  }
+
+  function openPrintPage(sel, link, qrBox, message){
+    var w = null;
+    try { w = window.open("", "_blank"); } catch(e){ w = null; }
+    if (!w || w.closed || typeof w.document === "undefined") return false;
+    try {
+      w.document.open();
+      w.document.write(buildPrintHtml(sel, link, qrMarkupFor(qrBox), message));
+      w.document.close();
+      if (w.focus) w.focus();
+    } catch(e){ return false; }
+    return true;
+  }
+
+  /* ===================== 患者さん用画面 ===================== */
+  function initPatientView(rxValue, msgValue){
+    var view = document.getElementById("patientView");
+    var body = document.getElementById("patientBody");
+    var overlay = document.getElementById("consentOverlay");
+    var chk = document.getElementById("consentCheckbox");
+    var agree = document.getElementById("consentAgreeBtn");
+
+    var sel = parseRxString(rxValue, state.exercises);
+
+    view.hidden = false;
+    view.setAttribute("inert", "");
+    view.setAttribute("aria-hidden", "true");
+    overlay.hidden = false;
+    document.body.classList.add("no-scroll");
+    chk.checked = false;
+    agree.disabled = true;
+    chk.addEventListener("change", function(){ agree.disabled = !chk.checked; });
+    agree.addEventListener("click", function(){
+      if (!chk.checked) return;
+      overlay.hidden = true;
+      document.body.classList.remove("no-scroll");
+      view.removeAttribute("inert");
+      view.removeAttribute("aria-hidden");
+      renderPatientBody(body, sel, decodeMessage(msgValue));
+    });
+    try { chk.focus(); } catch(e){}
+  }
+
+  function renderPatientBody(body, sel, message){
+    if (!sel.length){
+      body.innerHTML = '<p class="error-note" role="alert">' + esc(ERROR_TEXT) + '</p>';
+      return;
+    }
+    body.innerHTML =
+      (message ? '<section class="msg-card" aria-label="担当者からのメッセージ">' +
+        '<div class="msg-head"><span class="msg-icon">' + MSG_ICON + '</span><p class="msg-title">担当者からのメッセージ</p></div>' +
+        '<p class="msg-text">' + esc(message) + '</p></section>' : '') +
+      '<ul class="ex-cards">' + sel.map(function(s){
+        return '<li class="ex-card">' +
+          '<span class="ex-no">' + noLabel(s.no) + '</span>' +
+          '<div><span class="ex-name">' + esc(s.name) + '</span>' +
+          '<span class="qty-badge">' + esc(qtyText(s)) + '</span></div>' +
+          thumbHtml(s) +
+          '<a class="btn btn-primary" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + PLAY_ICON + '動画を見る</a>' +
+        '</li>';
+      }).join("") + '</ul>' +
+      '<p class="patient-note">' + esc(PATIENT_NOTE) + '</p>';
+    // サムネイルは高画質のものから順に試す。動画によっては高画質版がないため、
+    // 読めない・120×90 の灰色の画像(見つからないときの画像)なら次の画質へ。どれもなければ枠ごと消す
+    var imgs = body.querySelectorAll(".ex-thumb img");
+    for (var i = 0; i < imgs.length; i++){
+      (function(img){
+        var step = 0;
+        function next(){
+          step++;
+          if (step < THUMB_QUALITIES.length){
+            img.src = "https://i.ytimg.com/vi/" + img.getAttribute("data-yt") + "/" + THUMB_QUALITIES[step] + ".jpg";
+          } else {
+            var a = img.closest(".ex-thumb"); if (a && a.parentNode) a.parentNode.removeChild(a);
+          }
+        }
+        img.addEventListener("error", next);
+        img.addEventListener("load", function(){ if (img.naturalWidth && img.naturalWidth <= 120) next(); });
+      })(imgs[i]);
+    }
+  }
+
+  // YouTubeのURLから動画IDを取り出す(youtu.be / watch?v= / shorts / embed / live)。取り出せなければ ""
+  function youtubeId(url){
+    var u;
+    try { u = new URL(String(url || "")); } catch(e){ return ""; }
+    var host = u.hostname.toLowerCase().replace(/^(www|m|music)\./, "");
+    var id = "";
+    if (host === "youtu.be"){
+      id = u.pathname.split("/")[1] || "";
+    } else if (host === "youtube.com" || host === "youtube-nocookie.com"){
+      var p = u.pathname.split("/");
+      if (p[1] === "watch") id = u.searchParams.get("v") || "";
+      else if (/^(shorts|embed|live|v)$/.test(p[1] || "")) id = p[2] || "";
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+  }
+  // サムネイルの画質(高い順)。maxres=1280×720 / sd=640×480 / hq=480×360 / mq=320×180
+  var THUMB_QUALITIES = ["maxresdefault", "sddefault", "hqdefault", "mqdefault"];
+  // サムネイル(押すと動画が開く)。YouTube以外のリンクのときは出さない
+  function thumbHtml(s){
+    var id = youtubeId(s.url);
+    if (!id) return "";
+    return '<a class="ex-thumb" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">' +
+      '<img src="https://i.ytimg.com/vi/' + id + '/' + THUMB_QUALITIES[0] + '.jpg" data-yt="' + id + '" alt="" width="1280" height="720" decoding="async" referrerpolicy="no-referrer">' +
+      '<span class="ex-thumb-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span>' +
+    '</a>';
+  }
+
+  /* ===================== 起動 ===================== */
+  // テスト用に内部関数を公開(個人情報は扱いません)
+  window.SelfCareRx = {
+    parseCSV: parseCSV, rowsToExercises: rowsToExercises,
+    buildRxString: buildRxString, parseRxString: parseRxString, youtubeId: youtubeId,
+    encodeMessage: encodeMessage, decodeMessage: decodeMessage, cleanMessage: cleanMessage,
+    buildPrintHtml: buildPrintHtml, BUILTIN_EXERCISES: BUILTIN_EXERCISES,
+    state: state, linkBase: linkBase, SHEET_CSV_URL: SHEET_CSV_URL, SHEET_URLS: SHEET_URLS
+  };
+
+  applyMainColor();
+  setLogos();
+  var rxParam = null, msgParam = null;
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    rxParam = qs.get("rx");
+    msgParam = qs.get("m");
+  } catch(e){ rxParam = null; }
+  var isPatient = (rxParam !== null);
+
+  window.SelfCareRx.ready = loadExercises().then(function(){
+    hideLoading();
+    if (isPatient) initPatientView(rxParam, msgParam);
+    else initStaffView();
+  });
+})();
+</script>
+</body>
+</html>
